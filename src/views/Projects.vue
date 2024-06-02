@@ -45,14 +45,14 @@ h2{
   margin-top: 1rem;
 }
 h5 a {
-  text-decoration: none; /* Remove underline from link */
+  text-decoration: none; 
   color: #288058;
-  font-weight: bold; /* Bold font */
+  font-weight: bold; 
 }
 
 h5 a:hover {
   color: #041d11;
-  text-decoration: underline; /* Underline on hover */
+  text-decoration: underline; 
 }
   </style>
   
