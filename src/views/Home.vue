@@ -61,6 +61,11 @@ h2{
   object-fit: cover;
   margin-left: 60%;
   margin-bottom: auto;
-  margin-right: 9%;
+  margin-right:9%;
 }
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
 </style>
