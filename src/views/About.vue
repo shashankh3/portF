@@ -3,13 +3,13 @@
     <section class="content-card">
       <div class="section-header">
         <span class="eyebrow">About me</span>
-        <h1>Full-Stack Developer with hands-on AI integration and REST API expertise.</h1>
+        <h1>Full-Stack & Android Developer with hands-on AI integration and REST API expertise.</h1>
       </div>
       <p>
-        I build production-grade web applications featuring AI integration, secure authentication, and cloud deployment. Experienced in architecting full-stack platforms with Django backends, modern React/Next.js frontends, and prompt engineering for AI model optimization.
+        Full-Stack & Android Developer with hands-on experience in AI-integrated applications, REST API development, and prompt engineering. Skilled in Python, JavaScript, React, Next.js, and mobile development, with a proven ability to build and deploy production-grade platforms featuring AI integration, JWT authentication, and cloud hosting.
       </p>
       <p style="margin-top: 1.5rem; color: rgba(244, 249, 255, 0.78); font-size: 1rem;">
-        Currently contributing to UN volunteering initiatives, combining technical expertise with a commitment to sustainable development.
+        Currently a Freelance Android Developer (Safaikart via Expo Go) and Online Volunteer with United Nations OICT, combining technical expertise with AI model training and collaborative open-source development.
       </p>
       <div class="skill-sections">
         <div>
@@ -17,16 +17,16 @@
           <p>C, C++, Python, JavaScript, TypeScript, SQL</p>
         </div>
         <div>
-          <h2>Frontend</h2>
-          <p>React.js, Next.js, Vue.js, Tailwind CSS, HTML/CSS</p>
+          <h2>Frontend & Mobile</h2>
+          <p>React.js, Next.js, Vue.js, Tailwind CSS, HTML/CSS, Android Development, Expo Go</p>
         </div>
         <div>
           <h2>Backend & Databases</h2>
           <p>Django, Django REST Framework, Node.js, PostgreSQL, SQLite</p>
         </div>
         <div>
-          <h2>Cloud & APIs</h2>
-          <p>Git, GitHub, Vercel, PythonAnywhere, Gemini API, JWT, Swagger</p>
+          <h2>Cloud, APIs & Tools</h2>
+          <p>Git, GitHub, VS Code, Postman, Vercel, PythonAnywhere, Gemini API, JWT, Swagger</p>
         </div>
       </div>
     </section>
