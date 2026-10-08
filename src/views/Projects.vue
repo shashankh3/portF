@@ -20,6 +20,18 @@
         </article>
         <article class="project-card">
           <div class="card-header">
+            <h2>RadeonShift AI</h2>
+            <span>Python · AMD ROCm · MI300X · Vercel</span>
+          </div>
+          <ul class="project-list">
+            <li>AI-assisted CUDA-to-HIP migration tool for AMD Developer Hackathon: ACT II, translating legacy NVIDIA code to AMD ROCm</li>
+            <li>Integrated architecture risk auditing and live MI300X telemetry tracking to accelerate enterprise hardware transitions</li>
+            <li>Deployed on Vercel</li>
+          </ul>
+          <a href="https://github.com/shashankh3" target="_blank">View on GitHub</a>
+        </article>
+        <article class="project-card">
+          <div class="card-header">
             <h2>Topic Feed Pro (Chrome Extension)</h2>
             <span>JavaScript · Python · HTML · CSS</span>
           </div>
@@ -29,18 +41,6 @@
             <li>Dual-filtering logic system for intelligent content sorting and personalization</li>
           </ul>
           <a href="https://github.com/shashankh3/TopicFeedGenerator" target="_blank">View on GitHub</a>
-        </article>
-        <article class="project-card">
-          <div class="card-header">
-            <h2>Spotify Web Player Clone</h2>
-            <span>Vue.js · JavaScript · HTML · JSON Server</span>
-          </div>
-          <ul class="project-list">
-            <li>Dynamic Vue.js web application supporting end-to-end CRUD operations for song database management</li>
-            <li>Full playlist creation, editing, and deletion functionality with persistent JSON server backend</li>
-            <li>Responsive design with a clean, intuitive user interface</li>
-          </ul>
-          <a href="https://github.com/shashankh3/spotify-vue" target="_blank">View on GitHub</a>
         </article>
       </div>
     </section>

@@ -6,7 +6,7 @@
         <h1>Let’s build something together.</h1>
       </div>
       <p>
-        Want to collaborate on a full-stack project, AI-integrated platform, or open-source initiative? Reach out through GitHub, LinkedIn, or email.
+        Want to collaborate on a full-stack project, Android app, AI-integrated platform, or open-source initiative? Reach out through GitHub, LinkedIn, or email.
       </p>
       <div class="contact-links">
         <a href="https://github.com/shashankh3" target="_blank" class="icon-link">

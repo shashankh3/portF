@@ -11,7 +11,7 @@
           <a href="#experience" class="hide-sm">Experience</a>
           <a href="#stack">Stack</a>
           <a href="#contact">Contact</a>
-          <a href="mailto:shashankh3@gmail.com" class="nav-resume">Hire Me</a>
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=shashankh3@gmail.com" target="_blank" rel="noopener noreferrer" class="nav-resume">Hire Me</a>
         </div>
       </div>
     </nav>
@@ -23,28 +23,27 @@
           I build <span class="gt">&gt;</span><span id="typed-text"></span><span class="cursor-blink"></span>
         </h1>
         <p class="hero-sub">
-          Full-stack developer specialising in <strong>AI-integrated web applications</strong>,
-          production-grade REST APIs, and end-to-end systems built with
-          <strong>Django · React · Next.js · TypeScript · Vue</strong>.
-          From architecture to deployment — I ship things that actually work.
+          Full-Stack, GenAI &amp; Mobile Engineer specialising in <strong>hardware-accelerated AI pipelines, 3D digital twins, and offline-first mobile systems</strong>. Skilled in
+          <strong>TypeScript · Python · React Native / Expo · Vue 3 · Three.js · Django · Fireworks AI · AMD ROCm / CUDA</strong>,
+          shipping production platforms with Mixture-of-Agents AI, deterministic GPU AST auditing, and Moodle REST APIs.
         </p>
         <div class="hero-ctas">
           <a href="#work" class="btn btn-prime">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="5 12 19 12"/><polyline points="12 5 19 12 12 19"/></svg>
             View Projects
           </a>
           <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="btn btn-ghost">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.478-10-10-10z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.478-10-10-10z"/></svg>
             GitHub
           </a>
           <a href="https://www.linkedin.com/in/shashankh3" target="_blank" rel="noreferrer" class="btn btn-ghost">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             LinkedIn
           </a>
         </div>
         <div class="hero-meta">
-          <div class="meta-item"><div class="label">Role</div><div class="val">Full-Stack Dev</div></div>
-          <div class="meta-item"><div class="label">Focus</div><div class="val">AI + Systems</div></div>
+          <div class="meta-item"><div class="label">Role</div><div class="val">Full-Stack · AI · Mobile Dev</div></div>
+          <div class="meta-item"><div class="label">Focus</div><div class="val">GenAI + ROCm/CUDA + Mobile</div></div>
           <div class="meta-item"><div class="label">Location</div><div class="val">India</div></div>
         </div>
       </section>
@@ -53,17 +52,17 @@
         <div class="about-grid">
           <div class="glass about-card">
             <div class="section-tag">Profile</div>
-            <h2 class="section-title">Building systems that hold up under pressure.</h2>
-            <p>Full-stack developer with hands-on experience in AI-integrated web applications, REST API development, prompt engineering, JWT authentication, and cloud deployment across Vercel and PythonAnywhere.</p>
-            <p>I build products that feel effortless on the surface and are defensively engineered underneath — reliable APIs, clean data flow, secure auth, and features that actually solve real problems at production scale.</p>
+            <h2 class="section-title">Engineering high-throughput systems across AI, cloud, and edge.</h2>
+            <p>Full-Stack, AI &amp; Android Developer with hands-on expertise building production-grade platforms, hardware-accelerated DevSecOps pipelines, and offline-first mobile architectures. Proven record of engineering complex systems—from deterministic CUDA-to-HIP migration tooling for AMD MI300X enterprise hardware (RadeonShift AI) and FIFA 2026 3D Digital Twin command centers (OmniPitch 2026) to state-level native Android LMS platforms (UNIlearn Maharashtra) and full-stack AI learning platforms (LearnFlow LMS).</p>
+            <p>Experienced in UN volunteering (UN India Technology Hub), large-scale AI model training and evaluation (Outlier.ai), and open-source tooling backed by high test coverage, clean AST manipulation, and resilient offline architectures.</p>
           </div>
           <div class="glass signal-card">
             <div class="section-tag">Signal</div>
             <ul>
-              <li>Production-grade LMS with role-based workflows, AI quiz generation, and real enrollment tracking.</li>
-              <li>Prompt-driven systems work including model evaluation, error injection, and response-quality improvement.</li>
-              <li>Frontend strength across React, Next.js, and Vue — performance-minded and component-first.</li>
-              <li>Backend architecture in Django with structured REST APIs, auth, and deployment pipelines.</li>
+              <li>Enterprise CUDA-to-HIP pipeline (RadeonShift AI) with MoA dual-agent audit &amp; live MI300X telemetry.</li>
+              <li>GenAI 3D Digital Twin command center (OmniPitch 2026) with Three.js, Vue 3, and 96% logic coverage.</li>
+              <li>High-performance offline-first mobile LMS (UNIlearn Maharashtra) with React Native 0.86, Expo 57 &amp; Moodle REST API.</li>
+              <li>Full-stack AI LMS (LearnFlow) with Fireworks AI Gauntlet quiz engine, JWT auth, and certification workflows.</li>
             </ul>
           </div>
         </div>
@@ -72,47 +71,93 @@
       <section id="work">
         <div class="section-tag">Selected Work</div>
         <h2 class="section-title">Projects that carry the portfolio.</h2>
-        <p class="section-desc">Production-focused builds — not demos. Each one ships with real auth, real data, and real deployment.</p>
+        <p class="section-desc">Production-focused builds verified with live telemetry, real APIs, and comprehensive test suites.</p>
         <div class="project-grid">
           <div class="glass project-card span-2">
-            <div class="proj-num">01 // FLAGSHIP BUILD</div>
+            <div class="proj-num">01 // AI + HARDWARE COMPUTE</div>
+            <div class="proj-title">RadeonShift AI</div>
+            <div class="proj-stack">TypeScript · Python · Fireworks AI · AMD ROCm · CUDA · MI300X Telemetry · Vercel</div>
+            <p class="proj-desc">Enterprise DevSecOps pipeline automating NVIDIA CUDA to AMD MI300X migration using deterministic risk scanners and a semantic Mixture-of-Agents (MoA) dual-agent architecture to catch critical migration bugs that standard tools miss.</p>
+            <ul class="proj-points">
+              <li>Layer 1 Deterministic Audit: Scans wavefront-64, inline PTX assembly, and WMMA matrix portability risks before AI inference.</li>
+              <li>Layer 2 Mixture-of-Agents AI: Dual-agent semantic code translation via Fireworks AI with architectural readiness scoring.</li>
+              <li>Live MI300X telemetry verification, provenance tracking (live, cached, demo), and real-time AST analysis.</li>
+              <li>Built for the AMD Developer Hackathon: ACT II — fully deployed and verified on Vercel.</li>
+            </ul>
+            <div class="proj-links">
+              <a href="https://github.com/shashankh3/RadeonShift-AI" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              <a href="https://radeon-shift-ai.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
+            </div>
+          </div>
+          <div class="glass project-card">
+            <div class="proj-num">02 // 3D GRAPHICS + GENAI</div>
+            <div class="proj-title">OmniPitch 2026</div>
+            <div class="proj-stack">Vue 3 · Three.js · TypeScript · Tailwind CSS · Fireworks AI · Supabase · Vite</div>
+            <p class="proj-desc">GenAI-powered 3D Digital Twin and command center simulation for the FIFA World Cup 2026, delivering interactive stadium spatial rendering and AI incident management.</p>
+            <ul class="proj-points">
+              <li>Real-time 3D stadium digital twin rendering engineered with Three.js and Vue 3.</li>
+              <li>GenAI command center simulation powered by Fireworks AI for real-time scenario and incident handling.</li>
+              <li>High-reliability architecture: 281 passing tests with 96% line coverage on logic layers, 630KB bundle size.</li>
+            </ul>
+            <div class="proj-links">
+              <a href="https://github.com/shashankh3/omnipitch-2026" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              <a href="https://omnipitch-2026.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
+            </div>
+          </div>
+          <div class="glass project-card">
+            <div class="proj-num">03 // NATIVE MOBILE &amp; OFFLINE</div>
+            <div class="proj-title">UNIlearn Maharashtra</div>
+            <div class="proj-stack">React Native 0.86 · Expo SDK 57 · React 19 · Moodle REST API · Jest · Android</div>
+            <p class="proj-desc">High-performance, offline-first native mobile LMS built for the Maharashtra State e-learning initiative, interfacing directly with Moodle Web Services REST API.</p>
+            <ul class="proj-points">
+              <li>Offline-first local caching engine with encrypted token storage and secure biometric/session auth.</li>
+              <li>Seamless sync with Moodle REST API 4.x for real-time course enrollment, submissions, and gradebooks.</li>
+              <li>Accessible, trilingual vernacular UI optimized for smooth 60fps performance on low-end Android hardware (60+ Jest tests).</li>
+            </ul>
+            <div class="proj-links">
+              <a href="https://github.com/shashankh3/moodle-lms-android" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+            </div>
+          </div>
+          <div class="glass project-card span-2">
+            <div class="proj-num">04 // FULL-STACK AI PLATFORM</div>
             <div class="proj-title">LearnFlow LMS</div>
-            <div class="proj-stack">Django · Next.js · TypeScript · Tailwind CSS · Gemini API · JWT</div>
-            <p class="proj-desc">Production-grade learning management system engineered from the ground up — distinct instructor and student roles, real-time enrollment tracking, and an AI-powered quiz engine that reads YouTube lesson transcripts and generates structured assessments automatically.</p>
+            <div class="proj-stack">Next.js · TypeScript · Django · Tailwind CSS · Fireworks AI &amp; Gemini · JWT</div>
+            <p class="proj-desc">Full-stack learning management system bridging video education and active retention through a dual Instructor/Student portal and an interactive AI challenge engine.</p>
             <ul class="proj-points">
-              <li>AI-powered quiz generation from YouTube lesson transcripts using Google Gemini API.</li>
-              <li>Secure JWT authentication, role-based access, and full REST API with Swagger/Postman docs.</li>
-              <li>Deployed across Vercel (frontend) and PythonAnywhere (backend) — production, not a demo.</li>
-              <li>Instructor analytics and student progress tracking with real enrollment data flows.</li>
+              <li>'Test Your Might' AI Gauntlet: generates on-demand interactive assessments from lesson content with human-in-the-loop review.</li>
+              <li>Course Architect &amp; Live Analytics: instructors track student progress percentages and enrollments in real time.</li>
+              <li>Automated high-fidelity, print-ready Certificate of Completion generation upon 100% course completion.</li>
+              <li>Secure JWT authentication, role-based workflows, and internationalization (i18n) ready architecture.</li>
             </ul>
             <div class="proj-links">
-              <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              <a href="https://github.com/shashankh3/LearnFlow-LMS" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
             </div>
           </div>
           <div class="glass project-card">
-            <div class="proj-num">02 // SMART EXTENSION</div>
+            <div class="proj-num">05 // SMART ECO-ASSISTANT</div>
+            <div class="proj-title">DIBS (Do It Before Scrap)</div>
+            <div class="proj-stack">JavaScript · Geolocation API · Heatmaps · Context-Aware Routing · UI/UX</div>
+            <p class="proj-desc">Smart circular economy assistant that intelligently routes household items away from landfills using user location, item condition, and real-time scrap dealer heatmaps.</p>
+            <ul class="proj-points">
+              <li>Gamified Swipe Interface: dynamic card-swipe routing ('call DIBS', pass, or scrap) based on GPS coordinates.</li>
+              <li>Scrap Route Heatmap: live visual map assisting local scrap collectors with real-time weight accumulation by pincode.</li>
+              <li>CO2 Impact Tracker: calculates carbon emissions saved from diverted waste with interactive community metrics.</li>
+            </ul>
+            <div class="proj-links">
+              <a href="https://github.com/shashankh3/dibs" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+            </div>
+          </div>
+          <div class="glass project-card">
+            <div class="proj-num">06 // BROWSER EXTENSION &amp; PROMPT AI</div>
             <div class="proj-title">TopicFeedPro</div>
-            <div class="proj-stack">JavaScript · Python · HTML · CSS</div>
-            <p class="proj-desc">AI-engineered Chrome extension that overrides YouTube's default feed with a custom, prompt-driven algorithm. Built using intentional prompt engineering to control content sorting, not just filter it.</p>
+            <div class="proj-stack">JavaScript · Chrome Extensions Manifest V3 · Prompt Engineering · YouTube API</div>
+            <p class="proj-desc">AI-engineered browser extension that overrides YouTube's recommendation feed with intent-driven topic filtering, organizing content by views and relevance.</p>
             <ul class="proj-points">
-              <li>Replaced default recommendations with a dual-filtering, intent-aware content system.</li>
-              <li>2–3s load times via intelligent caching, global deduplication, and optimised logic.</li>
+              <li>Replaces algorithmic recommendations with purposeful, user-specified topic feeds.</li>
+              <li>Zero-latency client-side caching, global deduplication, and optimized view-count sorting logic.</li>
             </ul>
             <div class="proj-links">
-              <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
-            </div>
-          </div>
-          <div class="glass project-card">
-            <div class="proj-num">03 // FRONTEND SYSTEM</div>
-            <div class="proj-title">Spotify Web Player Clone</div>
-            <div class="proj-stack">Vue.js · JavaScript · HTML · JSON Server</div>
-            <p class="proj-desc">Dynamic Vue.js music player supporting end-to-end CRUD on a live song database. Built to demonstrate structured component-driven development with reactive state management.</p>
-            <ul class="proj-points">
-              <li>Full CRUD for song management with a real JSON server backend.</li>
-              <li>Component-first Vue architecture with clean separation of state and UI concerns.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              <a href="https://github.com/shashankh3/TopicFeedGenerator" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
             </div>
           </div>
         </div>
@@ -126,10 +171,19 @@
           <div class="tl-item">
             <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
             <div class="glass tl-body">
-              <div class="tl-meta">March 2026 — Present · Remote, New Delhi</div>
-              <div class="tl-org">United Nations Volunteers (UNV) — OICT</div>
+              <div class="tl-meta">March 2026 — Present · Remote</div>
+              <div class="tl-org">Freelance Android Developer — Safaikart</div>
+              <div class="tl-role">End-to-end Android Application (Expo Go)</div>
+              <p class="tl-desc">Developing Safaikart, an end-to-end Android application via Expo Go for a local business providing comprehensive laundry, delivery, and home sofa cleaning services. Accelerating the development lifecycle with AI-integrated workflows for rapid code generation, debugging, and scalable architecture design.</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+            <div class="glass tl-body">
+              <div class="tl-meta">March 2026 — Present · New Delhi (Remote)</div>
+              <div class="tl-org">United Nations OICT — UN India Technology Hub</div>
               <div class="tl-role">Online Volunteer — Software Development Support</div>
-              <p class="tl-desc">Contributing to software development support for the UN India Technology Hub under the Office of Information and Communications Technology. Work spans technical documentation, development tasks, and deployment of digital solutions aligned with UN sustainable development goals.</p>
+              <p class="tl-desc">Contributing to software development support for the UN India Technology Hub under the Office of Information and Communications Technology (OICT). Assisting with technical documentation, development tasks, and deployment of digital solutions aligned with broader UN goals.</p>
             </div>
           </div>
           <div class="tl-item">
@@ -138,7 +192,7 @@
               <div class="tl-meta">October 2024 — December 2024 · Remote</div>
               <div class="tl-org">OUTLIER.AI</div>
               <div class="tl-role">Individual Contractor — Prompt Engineering</div>
-              <p class="tl-desc">Improved AI and LLM output quality by designing prompts that intentionally generate errors to enhance model learning. Reviewed outputs to identify deviations and implement response enhancement strategies.</p>
+              <p class="tl-desc">Optimized AI and LLM responses by designing prompts that intentionally generate errors to enhance model learning and improve accuracy. Trained AI models to refine their understanding and generate more accurate, context-aware responses by reviewing code and AI-generated outputs.</p>
             </div>
           </div>
         </div>
@@ -151,32 +205,53 @@
             <div class="skill-group">
               <div class="skill-group-label">Languages</div>
               <div class="tag-wrap">
-                <span class="tag">Python</span><span class="tag">JavaScript</span>
-                <span class="tag">TypeScript</span><span class="tag">SQL</span>
-                <span class="tag">C</span><span class="tag">C++</span>
+                <span class="tag">TypeScript</span><span class="tag">JavaScript</span>
+                <span class="tag">Python</span><span class="tag">C</span>
+                <span class="tag">C++</span><span class="tag">Java</span>
+                <span class="tag">SQL</span><span class="tag">HTML/CSS</span>
               </div>
             </div>
             <div class="skill-group">
-              <div class="skill-group-label">Frontend</div>
+              <div class="skill-group-label">AI &amp; GPU Acceleration</div>
               <div class="tag-wrap">
-                <span class="tag">React.js</span><span class="tag">Next.js</span>
-                <span class="tag">Vue.js</span><span class="tag">Tailwind CSS</span><span class="tag">HTML/CSS</span>
+                <span class="tag">Fireworks AI</span><span class="tag">Gemini API</span>
+                <span class="tag">LLM Evaluation &amp; QA</span><span class="tag">Mixture-of-Agents (MoA)</span>
+                <span class="tag">AMD ROCm</span><span class="tag">NVIDIA CUDA</span>
+                <span class="tag">Prompt Engineering</span>
               </div>
             </div>
             <div class="skill-group">
-              <div class="skill-group-label">Backend &amp; Data</div>
+              <div class="skill-group-label">Frontend &amp; 3D Graphics</div>
+              <div class="tag-wrap">
+                <span class="tag">React 19</span><span class="tag">Next.js</span>
+                <span class="tag">Vue 3</span><span class="tag">Three.js (3D WebGL)</span>
+                <span class="tag">Tailwind CSS</span><span class="tag">Vite</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <div class="skill-group-label">Mobile &amp; Offline Systems</div>
+              <div class="tag-wrap">
+                <span class="tag">React Native 0.86</span><span class="tag">Expo SDK 57</span>
+                <span class="tag">Android Development</span><span class="tag">Offline-First Storage</span>
+                <span class="tag">Moodle REST API</span>
+              </div>
+            </div>
+            <div class="skill-group">
+              <div class="skill-group-label">Backend &amp; Cloud</div>
               <div class="tag-wrap">
                 <span class="tag">Django</span><span class="tag">Django REST Framework</span>
-                <span class="tag">Node.js</span><span class="tag">PostgreSQL</span><span class="tag">SQLite</span>
+                <span class="tag">Node.js</span><span class="tag">Supabase</span>
+                <span class="tag">PostgreSQL</span><span class="tag">SQLite</span>
+                <span class="tag">JWT Auth</span>
               </div>
             </div>
             <div class="skill-group">
-              <div class="skill-group-label">Cloud, APIs &amp; Tools</div>
+              <div class="skill-group-label">DevOps, Testing &amp; Tooling</div>
               <div class="tag-wrap">
                 <span class="tag">Git</span><span class="tag">GitHub</span>
-                <span class="tag">Vercel</span><span class="tag">PythonAnywhere</span>
-                <span class="tag">Gemini API</span><span class="tag">JWT</span>
-                <span class="tag">Postman</span><span class="tag">Swagger</span><span class="tag">VS Code</span>
+                <span class="tag">Vercel</span><span class="tag">Jest (Unit Testing)</span>
+                <span class="tag">Postman</span><span class="tag">Swagger / OpenAPI</span>
+                <span class="tag">VS Code</span>
               </div>
             </div>
           </div>
@@ -201,6 +276,7 @@
           <div class="glass creds-card">
             <div class="section-tag">Certifications</div>
             <ul class="cert-list">
+              <li>Microsoft AI Skills Fest (2026)</li>
               <li>Google AI Essentials</li>
               <li>Google Data Analytics Professional Certificate</li>
             </ul>
@@ -235,7 +311,7 @@
           <h2 class="contact-headline">Let's build something sharp,<br>useful, and real.</h2>
           <p class="contact-sub">Open to full-time roles, contracts, and collaborations. I reply fast.</p>
           <div class="contact-links">
-            <a href="mailto:shashankh3@gmail.com" class="contact-link">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=shashankh3@gmail.com" target="_blank" rel="noopener noreferrer" class="contact-link">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
               shashankh3@gmail.com
             </a>
@@ -298,7 +374,7 @@ export default {
     },
     initTyping() {
       const el = document.getElementById('typed-text');
-      const phrases = ['_', ' apps', ' APIs', ' systems', ' the future'];
+      const phrases = ['_', ' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
       let pi = 0, ci = 0, deleting = false, wait = 0;
       const tick = () => {
         const phrase = phrases[pi];
@@ -370,13 +446,16 @@ nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);-webkit-backdrop
 @keyframes cursor-pulse{0%,49%{opacity:1}50%,100%{opacity:0}}
 .hero-sub{font-size:clamp(.95rem,1.6vw,1.15rem);color:var(--muted);line-height:1.75;max-width:68ch;margin-bottom:var(--s8);}
 .hero-sub strong{color:#c8ffda;font-weight:500}
-.hero-ctas{display:flex;flex-wrap:wrap;gap:var(--s3);margin-bottom:var(--s10)}
-.btn{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.3rem;border-radius:8px;transition:transform .2s var(--ease-out),box-shadow .2s var(--ease-out),background .2s var(--ease-out);}
+.hero-ctas{display:flex;flex-wrap:wrap;gap:var(--s3);margin-bottom:var(--s10);align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-size:.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;text-decoration:none!important;padding:.75rem 1.45rem;border-radius:8px;cursor:pointer;transition:all .22s var(--ease-out);}
+.btn svg{display:inline-block;flex-shrink:0;vertical-align:middle;transition:transform .2s var(--ease-out)}
 .btn:hover{transform:translateY(-2px)}
-.btn-prime{background:rgba(52,255,110,.12);border:1px solid rgba(52,255,110,.45);color:#d6ffdf;}
-.btn-prime:hover{box-shadow:0 0 24px rgba(52,255,110,.18),0 4px 20px rgba(0,0,0,.4)}
-.btn-ghost{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);color:var(--muted);}
-.btn-ghost:hover{border-color:rgba(255,255,255,.25);color:var(--text)}
+.btn-prime{background:linear-gradient(135deg,#34ff6e 0%,#15cf4e 100%);border:1px solid #57ff8a;color:#031c0a!important;box-shadow:0 0 24px rgba(52,255,110,.45),0 4px 14px rgba(0,0,0,.5);}
+.btn-prime:hover{background:linear-gradient(135deg,#54ff87 0%,#24df61 100%);box-shadow:0 0 35px rgba(52,255,110,.75),0 6px 22px rgba(0,0,0,.6);color:#021407!important;}
+.btn-prime:hover svg{transform:translateX(3px)}
+.btn-ghost{background:rgba(52,255,110,.08);border:1px solid rgba(52,255,110,.42);color:#eafff0!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 0 12px rgba(52,255,110,.06);}
+.btn-ghost:hover{background:rgba(52,255,110,.2);border-color:#34ff6e;color:#34ff6e!important;box-shadow:0 0 24px rgba(52,255,110,.4),0 6px 20px rgba(0,0,0,.6);}
+.btn-ghost:hover svg{transform:scale(1.15)}
 .hero-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3);max-width:560px;}
 .meta-item{padding:var(--s4);border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);}
 .meta-item .label{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:.25rem;}
@@ -406,8 +485,8 @@ h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:
 .proj-points li{display:grid;grid-template-columns:auto 1fr;gap:.6rem;font-size:.9rem;color:var(--muted);line-height:1.6}
 .proj-points li::before{content:'›';color:var(--green);font-size:1rem;font-weight:700}
 .proj-links{display:flex;gap:var(--s3);margin-top:var(--s6)}
-.proj-link{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.38rem .8rem;border-radius:6px;border:1px solid var(--border);color:var(--muted);transition:border-color .2s,color .2s,background .2s;}
-.proj-link:hover{border-color:var(--border-hover);color:var(--green);background:var(--green-dim)}
+.proj-link{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:.38rem .8rem;border-radius:6px;border:1px solid rgba(52,255,110,.35);background:rgba(52,255,110,.05);color:#d4ffdf;transition:border-color .2s,color .2s,background .2s,box-shadow .2s;}
+.proj-link:hover{border-color:var(--green);color:var(--green);background:rgba(52,255,110,.16);box-shadow:0 0 14px rgba(52,255,110,.25)}
 .timeline{display:grid;gap:var(--s5)}
 .tl-item{display:grid;grid-template-columns:3px 1fr;gap:var(--s6)}
 .tl-line{position:relative;display:flex;flex-direction:column;align-items:center}
@@ -449,8 +528,8 @@ h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:
 .contact-headline{font-size:clamp(1.5rem,3.5vw,2.8rem);letter-spacing:-.03em;color:#e8fff3;margin-bottom:var(--s4);line-height:1.15}
 .contact-sub{color:var(--muted);margin-bottom:var(--s8);max-width:48ch;margin-inline:auto;line-height:1.75}
 .contact-links{display:flex;flex-wrap:wrap;gap:var(--s4);justify-content:center}
-.contact-link{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.3rem;border-radius:8px;border:1px solid var(--border);color:var(--muted);transition:all .22s var(--ease-out);}
-.contact-link:hover{border-color:var(--border-hover);color:var(--green);background:var(--green-dim);transform:translateY(-2px)}
+.contact-link{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.3rem;border-radius:8px;border:1px solid rgba(52,255,110,.35);background:rgba(52,255,110,.06);color:#e6ffee!important;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.3);transition:all .22s var(--ease-out);}
+.contact-link:hover{border-color:var(--green);color:var(--green)!important;background:rgba(52,255,110,.16);box-shadow:0 0 20px rgba(52,255,110,.35);transform:translateY(-2px)}
 footer{padding:var(--s8) var(--s6);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s4);max-width:1200px;margin-inline:auto;}
 footer p{font-family:var(--font-mono);font-size:.67rem;letter-spacing:.1em;color:var(--faint)}
 footer p span{color:var(--green)}

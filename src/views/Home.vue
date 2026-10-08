@@ -4,9 +4,9 @@
       <div class="hero-copy">
         <span class="eyebrow">Portfolio</span>
         <h1>Hi, I’m Shashank.</h1>
-        <p class="hero-subtitle">Full-Stack Developer | AI Integration | REST APIs</p>
+        <p class="hero-subtitle">Full-Stack & Android Developer | AI Integration | REST APIs</p>
         <p class="hero-text">
-          I engineer production-grade web applications with AI integration, robust backends, and modern frontends. Experienced in building full-stack platforms with Django, React/Next.js, and AI-powered features.
+          I engineer production-grade applications with AI integration, robust backends, and modern frontends — plus end-to-end Android development with Expo Go. Experienced in building full-stack platforms with Django, React/Next.js, JWT auth, and AI-powered features, alongside UN volunteering and AI model training.
         </p>
         <router-link to="/projects" class="primary-button">View my work</router-link>
       </div>
