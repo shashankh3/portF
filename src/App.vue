@@ -5,7 +5,10 @@
 
     <nav>
       <div class="nav-inner">
-        <div class="nav-logo">SH <span>// DEV</span></div>
+        <div class="nav-logo">
+          <img src="/favicon.svg" alt="Tara Yantra" class="nav-yantra-icon" />
+          <span>SH // DEV</span>
+        </div>
         <div class="nav-links">
           <a href="#work">Work</a>
           <a href="#experience" class="hide-sm">Experience</a>
@@ -493,8 +496,10 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 .shell{position:relative;z-index:2;width:min(1200px,calc(100% - var(--s8)));margin-inline:auto}
 nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(0,0,0,.38);border-bottom:1px solid rgba(52,255,110,.1);}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s6);max-width:1200px;margin-inline:auto;}
-.nav-logo{font-family:var(--font-mono);font-size:.8rem;font-weight:700;letter-spacing:.2em;color:var(--green);text-transform:uppercase;}
+.nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-size:.8rem;font-weight:700;letter-spacing:.2em;color:var(--green);text-transform:uppercase;}
 .nav-logo span{color:var(--muted)}
+.nav-yantra-icon{width:22px;height:22px;border-radius:4px;filter:drop-shadow(0 0 6px rgba(255,215,0,.7));transition:transform .3s var(--ease-out),filter .3s;}
+.nav-logo:hover .nav-yantra-icon{transform:rotate(45deg) scale(1.1);filter:drop-shadow(0 0 12px rgba(255,215,0,.95))}
 .nav-links{display:flex;gap:var(--s6);align-items:center}
 .nav-links a{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:color .2s var(--ease-out);}
 .nav-links a:hover{color:var(--green)}
