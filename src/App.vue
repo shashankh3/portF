@@ -434,8 +434,7 @@ export default {
           drops[i]++;
         }
       };
-      const loop = () => { draw(); requestAnimationFrame(loop); };
-      requestAnimationFrame(loop);
+      setInterval(draw, 40);
     },
     initTyping() {
       const el = document.getElementById('typed-text');
