@@ -114,19 +114,22 @@
             </div>
             <ProjectVideo id="omnipitch" src="/videos/omnipitch.mp4" poster="/videos/omnipitch-poster.jpg" url="omnipitch-2026.vercel.app/fan" />
           </div>
-          <div class="glass project-card span-2">
-            <div class="proj-num">03 // NATIVE MOBILE &amp; OFFLINE</div>
-            <div class="proj-title">UNIlearn Maharashtra</div>
-            <div class="proj-stack">React Native 0.86 · Expo SDK 57 · React 19 · Moodle REST API · Jest · Android</div>
-            <p class="proj-desc">High-performance, offline-first native mobile LMS built for the Maharashtra State e-learning initiative, interfacing directly with Moodle Web Services REST API.</p>
-            <ul class="proj-points">
-              <li>Offline-first local caching engine with encrypted token storage and secure biometric/session auth.</li>
-              <li>Seamless sync with Moodle REST API 4.x for real-time course enrollment, submissions, and gradebooks.</li>
-              <li>Accessible, trilingual vernacular UI optimized for smooth 60fps performance on low-end Android hardware (60+ Jest tests).</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/moodle-lms-android" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+          <div class="glass project-card has-video span-2">
+            <div class="proj-body">
+              <div class="proj-num">03 // NATIVE MOBILE &amp; OFFLINE</div>
+              <div class="proj-title">UNIlearn Maharashtra</div>
+              <div class="proj-stack">React Native 0.86 · Expo SDK 57 · React 19 · Moodle REST API · Jest · Android</div>
+              <p class="proj-desc">High-performance, offline-first native mobile LMS built for the Maharashtra State e-learning initiative, interfacing directly with Moodle Web Services REST API.</p>
+              <ul class="proj-points">
+                <li>Offline-first local caching engine with encrypted token storage and secure biometric/session auth.</li>
+                <li>Seamless sync with Moodle REST API 4.x for real-time course enrollment, submissions, and gradebooks.</li>
+                <li>Accessible, trilingual vernacular UI optimized for smooth 60fps performance on low-end Android hardware (60+ Jest tests).</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/moodle-lms-android" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              </div>
             </div>
+            <ProjectMockup id="moodle" type="mobile" url="github.com/shashankh3/moodle-lms-android" />
           </div>
           <div class="glass project-card has-video span-2">
             <div class="proj-body">
@@ -147,19 +150,22 @@
             </div>
             <ProjectVideo id="lms" src="/videos/lms.mp4" poster="/videos/lms-poster.jpg" url="frontend-phi-black-88.vercel.app" />
           </div>
-          <div class="glass project-card span-2">
-            <div class="proj-num">05 // SMART ECO-ASSISTANT</div>
-            <div class="proj-title">DIBS (Do It Before Scrap)</div>
-            <div class="proj-stack">JavaScript · Geolocation API · Heatmaps · Context-Aware Routing · UI/UX</div>
-            <p class="proj-desc">Smart circular economy assistant that intelligently routes household items away from landfills using user location, item condition, and real-time scrap dealer heatmaps.</p>
-            <ul class="proj-points">
-              <li>Gamified Swipe Interface: dynamic card-swipe routing ('call DIBS', pass, or scrap) based on GPS coordinates.</li>
-              <li>Scrap Route Heatmap: live visual map assisting local scrap collectors with real-time weight accumulation by pincode.</li>
-              <li>CO2 Impact Tracker: calculates carbon emissions saved from diverted waste with interactive community metrics.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/dibs" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+          <div class="glass project-card has-video span-2">
+            <div class="proj-body">
+              <div class="proj-num">05 // SMART ECO-ASSISTANT</div>
+              <div class="proj-title">DIBS (Do It Before Scrap)</div>
+              <div class="proj-stack">JavaScript · Geolocation API · Heatmaps · Context-Aware Routing · UI/UX</div>
+              <p class="proj-desc">Smart circular economy assistant that intelligently routes household items away from landfills using user location, item condition, and real-time scrap dealer heatmaps.</p>
+              <ul class="proj-points">
+                <li>Gamified Swipe Interface: dynamic card-swipe routing ('call DIBS', pass, or scrap) based on GPS coordinates.</li>
+                <li>Scrap Route Heatmap: live visual map assisting local scrap collectors with real-time weight accumulation by pincode.</li>
+                <li>CO2 Impact Tracker: calculates carbon emissions saved from diverted waste with interactive community metrics.</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/dibs" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              </div>
             </div>
+            <ProjectMockup id="dibs" type="radar" url="github.com/shashankh3/dibs" />
           </div>
           <div class="glass project-card has-video">
             <div class="proj-body">
@@ -178,6 +184,8 @@
             <ProjectVideo id="topicfeed" src="/videos/topicfeed.mp4" poster="/videos/topicfeed-poster.jpg" url="youtube.com — Topic Feed Pro extension" />
           </div>
         </div>
+
+        <GitHubActivity />
       </section>
 
       <section id="experience">
@@ -345,6 +353,21 @@
       </section>
     </div>
 
+    <!-- Floating Back-to-Top Button -->
+    <button
+      class="back-to-top"
+      :class="{ 'is-visible': showBackToTop }"
+      type="button"
+      aria-label="Back to top"
+      title="Back to top"
+      @click="scrollToTop"
+    >
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+      <span class="btt-text">TOP</span>
+    </button>
+
     <footer>
       <p>© 2026 <span>Shashank Hirwani</span> — All rights reserved.</p>
       <p>Built with ♥ in India</p>
@@ -354,15 +377,36 @@
 
 <script>
 import ProjectVideo from './components/ProjectVideo.vue';
+import ProjectMockup from './components/ProjectMockup.vue';
+import GitHubActivity from './components/GitHubActivity.vue';
 
 export default {
   name: 'App',
-  components: { ProjectVideo },
+  components: { ProjectVideo, ProjectMockup, GitHubActivity },
+  data: () => ({
+    showBackToTop: false,
+    scrollHandler: null
+  }),
   mounted() {
     this.initMatrix();
     this.initTyping();
+    this.initScrollListener();
+  },
+  beforeUnmount() {
+    if (this.scrollHandler) {
+      window.removeEventListener('scroll', this.scrollHandler);
+    }
   },
   methods: {
+    initScrollListener() {
+      this.scrollHandler = () => {
+        this.showBackToTop = window.scrollY > 400;
+      };
+      window.addEventListener('scroll', this.scrollHandler, { passive: true });
+    },
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
     initMatrix() {
       const canvas = document.getElementById('matrix-canvas');
       const ctx = canvas.getContext('2d');
@@ -555,6 +599,11 @@ h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:
 footer{padding:var(--s8) var(--s6);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s4);max-width:1200px;margin-inline:auto;}
 footer p{font-family:var(--font-mono);font-size:.67rem;letter-spacing:.1em;color:var(--faint)}
 footer p span{color:var(--green)}
+.back-to-top{position:fixed;bottom:2rem;right:2rem;z-index:99;display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.65rem .95rem;border-radius:99px;background:rgba(3,15,7,.85);border:1px solid rgba(52,255,110,.45);color:var(--green);box-shadow:0 8px 32px rgba(0,0,0,.7),0 0 20px rgba(52,255,110,.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),visibility .3s,background .2s,box-shadow .2s;}
+.back-to-top.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
+.back-to-top:hover{background:rgba(52,255,110,.2);border-color:var(--green);box-shadow:0 0 30px rgba(52,255,110,.45),0 8px 24px rgba(0,0,0,.8);transform:translateY(-3px);}
+.back-to-top svg{transition:transform .2s var(--ease-out);}
+.back-to-top:hover svg{transform:translateY(-2px);}
 @media(max-width:960px){
   .about-grid,.skills-grid{grid-template-columns:1fr}
   .project-grid,.creds-grid{grid-template-columns:1fr}
@@ -567,5 +616,6 @@ footer p span{color:var(--green)}
   .hero-meta{grid-template-columns:1fr}
   .tl-item{gap:var(--s4)}
   .tl-body,.project-card,.about-card,.signal-card,.skills-card,.edu-card,.creds-card{padding:var(--s6)}
+  .back-to-top{bottom:1.25rem;right:1.25rem;padding:.5rem .75rem;font-size:.62rem;}
 }
 </style>
