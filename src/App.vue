@@ -73,38 +73,44 @@
         <h2 class="section-title">Projects that carry the portfolio.</h2>
         <p class="section-desc">Production-focused builds verified with live telemetry, real APIs, and comprehensive test suites.</p>
         <div class="project-grid">
+          <div class="glass project-card has-video span-2">
+            <div class="proj-body">
+              <div class="proj-num">01 // AI + HARDWARE COMPUTE</div>
+              <div class="proj-title">RadeonShift AI</div>
+              <div class="proj-stack">TypeScript · Python · Fireworks AI · AMD ROCm · CUDA · MI300X Telemetry · Vercel</div>
+              <p class="proj-desc">Enterprise DevSecOps pipeline automating NVIDIA CUDA to AMD MI300X migration using deterministic risk scanners and a semantic Mixture-of-Agents (MoA) dual-agent architecture to catch critical migration bugs that standard tools miss.</p>
+              <ul class="proj-points">
+                <li>Layer 1 Deterministic Audit: Scans wavefront-64, inline PTX assembly, and WMMA matrix portability risks before AI inference.</li>
+                <li>Layer 2 Mixture-of-Agents AI: Dual-agent semantic code translation via Fireworks AI with architectural readiness scoring.</li>
+                <li>Live MI300X telemetry verification, provenance tracking (live, cached, demo), and real-time AST analysis.</li>
+                <li>Built for the AMD Developer Hackathon: ACT II — fully deployed and verified on Vercel.</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/RadeonShift-AI" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+                <a href="https://radeon-shift-ai.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
+              </div>
+            </div>
+            <ProjectVideo id="radeon" src="/videos/radeon.mp4" poster="/videos/radeon-poster.jpg" url="radeon-shift-ai.vercel.app" />
+          </div>
+          <div class="glass project-card has-video">
+            <div class="proj-body">
+              <div class="proj-num">02 // 3D GRAPHICS + GENAI</div>
+              <div class="proj-title">OmniPitch 2026</div>
+              <div class="proj-stack">Vue 3 · Three.js · TypeScript · Tailwind CSS · Fireworks AI · Supabase · Vite</div>
+              <p class="proj-desc">GenAI-powered 3D Digital Twin and command center simulation for the FIFA World Cup 2026, delivering interactive stadium spatial rendering and AI incident management.</p>
+              <ul class="proj-points">
+                <li>Real-time 3D stadium digital twin rendering engineered with Three.js and Vue 3.</li>
+                <li>GenAI command center simulation powered by Fireworks AI for real-time scenario and incident handling.</li>
+                <li>High-reliability architecture: 281 passing tests with 96% line coverage on logic layers, 630KB bundle size.</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/omnipitch-2026" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+                <a href="https://omnipitch-2026.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
+              </div>
+            </div>
+            <ProjectVideo id="omnipitch" src="/videos/omnipitch.mp4" poster="/videos/omnipitch-poster.jpg" url="omnipitch-2026.vercel.app/fan" />
+          </div>
           <div class="glass project-card span-2">
-            <div class="proj-num">01 // AI + HARDWARE COMPUTE</div>
-            <div class="proj-title">RadeonShift AI</div>
-            <div class="proj-stack">TypeScript · Python · Fireworks AI · AMD ROCm · CUDA · MI300X Telemetry · Vercel</div>
-            <p class="proj-desc">Enterprise DevSecOps pipeline automating NVIDIA CUDA to AMD MI300X migration using deterministic risk scanners and a semantic Mixture-of-Agents (MoA) dual-agent architecture to catch critical migration bugs that standard tools miss.</p>
-            <ul class="proj-points">
-              <li>Layer 1 Deterministic Audit: Scans wavefront-64, inline PTX assembly, and WMMA matrix portability risks before AI inference.</li>
-              <li>Layer 2 Mixture-of-Agents AI: Dual-agent semantic code translation via Fireworks AI with architectural readiness scoring.</li>
-              <li>Live MI300X telemetry verification, provenance tracking (live, cached, demo), and real-time AST analysis.</li>
-              <li>Built for the AMD Developer Hackathon: ACT II — fully deployed and verified on Vercel.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/RadeonShift-AI" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
-              <a href="https://radeon-shift-ai.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
-            </div>
-          </div>
-          <div class="glass project-card">
-            <div class="proj-num">02 // 3D GRAPHICS + GENAI</div>
-            <div class="proj-title">OmniPitch 2026</div>
-            <div class="proj-stack">Vue 3 · Three.js · TypeScript · Tailwind CSS · Fireworks AI · Supabase · Vite</div>
-            <p class="proj-desc">GenAI-powered 3D Digital Twin and command center simulation for the FIFA World Cup 2026, delivering interactive stadium spatial rendering and AI incident management.</p>
-            <ul class="proj-points">
-              <li>Real-time 3D stadium digital twin rendering engineered with Three.js and Vue 3.</li>
-              <li>GenAI command center simulation powered by Fireworks AI for real-time scenario and incident handling.</li>
-              <li>High-reliability architecture: 281 passing tests with 96% line coverage on logic layers, 630KB bundle size.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/omnipitch-2026" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
-              <a href="https://omnipitch-2026.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
-            </div>
-          </div>
-          <div class="glass project-card">
             <div class="proj-num">03 // NATIVE MOBILE &amp; OFFLINE</div>
             <div class="proj-title">UNIlearn Maharashtra</div>
             <div class="proj-stack">React Native 0.86 · Expo SDK 57 · React 19 · Moodle REST API · Jest · Android</div>
@@ -118,22 +124,26 @@
               <a href="https://github.com/shashankh3/moodle-lms-android" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
             </div>
           </div>
-          <div class="glass project-card span-2">
-            <div class="proj-num">04 // FULL-STACK AI PLATFORM</div>
-            <div class="proj-title">LearnFlow LMS</div>
-            <div class="proj-stack">Next.js · TypeScript · Django · Tailwind CSS · Fireworks AI &amp; Gemini · JWT</div>
-            <p class="proj-desc">Full-stack learning management system bridging video education and active retention through a dual Instructor/Student portal and an interactive AI challenge engine.</p>
-            <ul class="proj-points">
-              <li>'Test Your Might' AI Gauntlet: generates on-demand interactive assessments from lesson content with human-in-the-loop review.</li>
-              <li>Course Architect &amp; Live Analytics: instructors track student progress percentages and enrollments in real time.</li>
-              <li>Automated high-fidelity, print-ready Certificate of Completion generation upon 100% course completion.</li>
-              <li>Secure JWT authentication, role-based workflows, and internationalization (i18n) ready architecture.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/LearnFlow-LMS" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+          <div class="glass project-card has-video span-2">
+            <div class="proj-body">
+              <div class="proj-num">04 // FULL-STACK AI PLATFORM</div>
+              <div class="proj-title">LearnFlow LMS</div>
+              <div class="proj-stack">Next.js · TypeScript · Django · Tailwind CSS · Fireworks AI &amp; Gemini · JWT</div>
+              <p class="proj-desc">Full-stack learning management system bridging video education and active retention through a dual Instructor/Student portal and an interactive AI challenge engine.</p>
+              <ul class="proj-points">
+                <li>'Test Your Might' AI Gauntlet: generates on-demand interactive assessments from lesson content with human-in-the-loop review.</li>
+                <li>Course Architect &amp; Live Analytics: instructors track student progress percentages and enrollments in real time.</li>
+                <li>Automated high-fidelity, print-ready Certificate of Completion generation upon 100% course completion.</li>
+                <li>Secure JWT authentication, role-based workflows, and internationalization (i18n) ready architecture.</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/LearnFlow-LMS" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+                <a href="https://frontend-phi-black-88.vercel.app/" target="_blank" rel="noreferrer" class="proj-link">Live Demo ↗</a>
+              </div>
             </div>
+            <ProjectVideo id="lms" src="/videos/lms.mp4" poster="/videos/lms-poster.jpg" url="frontend-phi-black-88.vercel.app" />
           </div>
-          <div class="glass project-card">
+          <div class="glass project-card span-2">
             <div class="proj-num">05 // SMART ECO-ASSISTANT</div>
             <div class="proj-title">DIBS (Do It Before Scrap)</div>
             <div class="proj-stack">JavaScript · Geolocation API · Heatmaps · Context-Aware Routing · UI/UX</div>
@@ -147,18 +157,21 @@
               <a href="https://github.com/shashankh3/dibs" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
             </div>
           </div>
-          <div class="glass project-card">
-            <div class="proj-num">06 // BROWSER EXTENSION &amp; PROMPT AI</div>
-            <div class="proj-title">TopicFeedPro</div>
-            <div class="proj-stack">JavaScript · Chrome Extensions Manifest V3 · Prompt Engineering · YouTube API</div>
-            <p class="proj-desc">AI-engineered browser extension that overrides YouTube's recommendation feed with intent-driven topic filtering, organizing content by views and relevance.</p>
-            <ul class="proj-points">
-              <li>Replaces algorithmic recommendations with purposeful, user-specified topic feeds.</li>
-              <li>Zero-latency client-side caching, global deduplication, and optimized view-count sorting logic.</li>
-            </ul>
-            <div class="proj-links">
-              <a href="https://github.com/shashankh3/TopicFeedGenerator" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+          <div class="glass project-card has-video">
+            <div class="proj-body">
+              <div class="proj-num">06 // BROWSER EXTENSION &amp; PROMPT AI</div>
+              <div class="proj-title">TopicFeedPro</div>
+              <div class="proj-stack">JavaScript · Chrome Extensions Manifest V3 · Prompt Engineering · YouTube API</div>
+              <p class="proj-desc">AI-engineered browser extension that overrides YouTube's recommendation feed with intent-driven topic filtering, organizing content by views and relevance.</p>
+              <ul class="proj-points">
+                <li>Replaces algorithmic recommendations with purposeful, user-specified topic feeds.</li>
+                <li>Zero-latency client-side caching, global deduplication, and optimized view-count sorting logic.</li>
+              </ul>
+              <div class="proj-links">
+                <a href="https://github.com/shashankh3/TopicFeedGenerator" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
+              </div>
             </div>
+            <ProjectVideo id="topicfeed" src="/videos/topicfeed.mp4" poster="/videos/topicfeed-poster.jpg" url="youtube.com — Topic Feed Pro extension" />
           </div>
         </div>
       </section>
@@ -336,8 +349,11 @@
 </template>
 
 <script>
+import ProjectVideo from './components/ProjectVideo.vue';
+
 export default {
   name: 'App',
+  components: { ProjectVideo },
   mounted() {
     this.initMatrix();
     this.initTyping();
@@ -476,7 +492,8 @@ h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:
 .signal-card li::before{content:'//';font-family:var(--font-mono);font-size:.7rem;color:var(--green);font-weight:700;white-space:nowrap}
 .project-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
 .project-card{padding:var(--s8)}
-.project-card.span-2{grid-column:1/-1}
+.project-card.span-2,.project-card.has-video{grid-column:1/-1}
+.project-card.has-video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:var(--s8);align-items:center}
 .proj-num{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--faint);margin-bottom:var(--s4)}
 .proj-title{font-size:1.4rem;font-weight:600;letter-spacing:-.02em;color:#e8fff2;margin-bottom:var(--s2)}
 .proj-stack{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.08em;color:var(--green);margin-bottom:var(--s5)}
@@ -536,7 +553,8 @@ footer p span{color:var(--green)}
 @media(max-width:960px){
   .about-grid,.skills-grid{grid-template-columns:1fr}
   .project-grid,.creds-grid{grid-template-columns:1fr}
-  .project-card.span-2{grid-column:1}
+  .project-card.span-2,.project-card.has-video{grid-column:1}
+  .project-card.has-video{grid-template-columns:1fr;gap:var(--s6)}
   .hero-meta{grid-template-columns:1fr 1fr}
 }
 @media(max-width:640px){
