@@ -173,3 +173,4 @@ export default {
   .pv-stage{aspect-ratio:auto;min-height:220px}
 }
 </style>
+
