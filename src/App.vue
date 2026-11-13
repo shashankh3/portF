@@ -692,8 +692,9 @@ footer p span{color:var(--green)}
   .hero{min-height:auto;padding:var(--s10) 0 var(--s12)}
   .hero-label{font-size:.58rem;letter-spacing:.12em;line-height:1.5;align-items:flex-start;gap:.45rem}
   .hero-label::before{margin-top:.36rem;flex-shrink:0}
-  .hero-title{font-size:clamp(1.95rem,9.2vw,3rem);line-height:1.12;min-height:2.24em;letter-spacing:-.01em;margin-bottom:var(--s4)}
+  .hero-title{font-size:clamp(2.35rem,11.8vw,3rem);line-height:1.1;min-height:3.3em;letter-spacing:-.04em;font-weight:700;margin-bottom:var(--s4)}
   .hero-title-prefix{display:block}
+  .cursor-blink{width:.3em;margin-left:.04em}
   .hero-sub{font-size:.9rem;line-height:1.72;margin-bottom:var(--s6)}
   .hero-ctas{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:var(--s6)}
   .hero-ctas .btn{width:100%;justify-content:center;gap:.45rem;padding:.8rem .6rem;font-size:.68rem;letter-spacing:.05em;border-radius:10px}
