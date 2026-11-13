@@ -117,7 +117,7 @@
             </div>
             <ProjectVideo id="omnipitch" src="/videos/omnipitch.mp4" poster="/videos/omnipitch-poster.jpg" url="omnipitch-2026.vercel.app/fan" />
           </div>
-          <div class="glass project-card has-video span-2">
+          <div class="glass project-card has-video">
             <div class="proj-body">
               <div class="proj-num">03 // NATIVE MOBILE &amp; OFFLINE</div>
               <div class="proj-title">UNIlearn Maharashtra</div>
@@ -132,7 +132,7 @@
                 <a href="https://github.com/shashankh3/moodle-lms-android" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
               </div>
             </div>
-            <ProjectMockup id="moodle" type="mobile" url="github.com/shashankh3/moodle-lms-android" />
+            <ProjectVideo id="unilearn" src="/videos/unilearn.mp4" poster="/videos/unilearn-poster.jpg" url="UNIlearn Maharashtra — Android app" />
           </div>
           <div class="glass project-card has-video span-2">
             <div class="proj-body">
@@ -153,7 +153,7 @@
             </div>
             <ProjectVideo id="lms" src="/videos/lms.mp4" poster="/videos/lms-poster.jpg" url="frontend-phi-black-88.vercel.app" />
           </div>
-          <div class="glass project-card has-video span-2">
+          <div class="glass project-card has-video">
             <div class="proj-body">
               <div class="proj-num">05 // SMART ECO-ASSISTANT</div>
               <div class="proj-title">DIBS (Do It Before Scrap)</div>
@@ -168,7 +168,7 @@
                 <a href="https://github.com/shashankh3/dibs" target="_blank" rel="noreferrer" class="proj-link">GitHub →</a>
               </div>
             </div>
-            <ProjectMockup id="dibs" type="radar" url="github.com/shashankh3/dibs" />
+            <ProjectVideo id="dibs" src="/videos/dibs.mp4" poster="/videos/dibs-poster.jpg" url="DIBS — mobile app" />
           </div>
           <div class="glass project-card has-video">
             <div class="proj-body">
@@ -380,12 +380,11 @@
 
 <script>
 import ProjectVideo from './components/ProjectVideo.vue';
-import ProjectMockup from './components/ProjectMockup.vue';
 import GitHubActivity from './components/GitHubActivity.vue';
 
 export default {
   name: 'App',
-  components: { ProjectVideo, ProjectMockup, GitHubActivity },
+  components: { ProjectVideo, GitHubActivity },
   data: () => ({
     showBackToTop: false,
     scrollHandler: null
