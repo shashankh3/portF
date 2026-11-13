@@ -386,6 +386,7 @@ export default {
 .gh-calendar-scroll {
   overflow-x: auto;
   padding-bottom: 0.6rem;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(52, 255, 110, 0.3) #0d1117;
 }
@@ -590,8 +591,70 @@ export default {
 }
 
 @media (max-width: 800px) {
+  .gh-year-tabs {
+    width: 100%;
+  }
+  .gh-year-btn {
+    flex: 1;
+    padding: 0.5rem 0.25rem;
+  }
   .gh-telemetry-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .github-activity-card {
+    padding: 1.1rem;
+    border-radius: 16px;
+  }
+  .gh-top-bar {
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  .gh-top-left {
+    gap: 0.7rem;
+  }
+  .gh-logo-icon {
+    width: 19px;
+    height: 19px;
+  }
+  .gh-count {
+    font-size: 1.35rem;
+  }
+  .gh-subhead {
+    font-size: 0.82rem;
+  }
+  .gh-user-handle {
+    font-size: 0.6rem;
+  }
+  .gh-year-tabs {
+    padding: 0.2rem;
+    gap: 0.15rem;
+  }
+  .gh-year-btn {
+    font-size: 0.65rem;
+    min-height: 40px;
+  }
+  .gh-calendar-box {
+    padding: 0.8rem 0.65rem;
+    border-radius: 10px;
+  }
+  .gh-calendar-footer {
+    gap: 0.55rem;
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    font-size: 0.6rem;
+  }
+  .gh-telemetry-row {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .gh-tele-item {
+    padding: 0.65rem 0.8rem;
+  }
+  .gh-tele-val {
+    font-size: 0.8rem;
   }
 }
 </style>

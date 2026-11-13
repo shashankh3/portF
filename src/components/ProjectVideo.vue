@@ -37,6 +37,7 @@ export default {
   data: () => ({ playing: false, userPaused: false, visible: false }),
   mounted() {
     const v = this.$refs.video;
+    if (!v) return;
     v.addEventListener('play', () => { this.playing = true; });
     v.addEventListener('pause', () => { this.playing = false; });
     this.observer = new IntersectionObserver(([e]) => {
@@ -50,6 +51,7 @@ export default {
   methods: {
     toggle() {
       const v = this.$refs.video;
+      if (!v) return;
       if (v.paused) { this.userPaused = false; v.play().catch(() => {}); }
       else { this.userPaused = true; v.pause(); }
     }
@@ -71,4 +73,11 @@ export default {
 .pv-btn svg{display:block}
 .pv-stage:hover .pv-btn,.pv-btn:focus-visible{opacity:1}
 .pv-btn:hover{transform:scale(1.08);background:rgba(52,255,110,.18)}
+@media(max-width:640px){
+  .pv{border-radius:12px}
+  .pv-bar{gap:.55rem;padding:.45rem .65rem}
+  .pv-dots i{width:7px;height:7px}
+  .pv-url{font-size:.56rem;padding:.16rem .5rem}
+  .pv-btn{width:40px;height:40px;right:.55rem;bottom:.55rem;opacity:1}
+}
 </style>
