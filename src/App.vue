@@ -35,7 +35,7 @@
       <section class="hero">
         <div class="hero-label">System Online — Available for opportunities</div>
         <h1 class="hero-title">
-          <span class="hero-title-prefix">I build <span class="gt">&gt;</span></span><span id="typed-text"></span><span class="cursor-blink"></span>
+          <span class="hero-title-prefix">I build <span class="gt">&gt;</span><span class="prompt-bar" aria-hidden="true">_</span></span><span id="typed-text"></span><span class="cursor-blink"></span>
         </h1>
         <p class="hero-sub">
           Full-Stack, GenAI &amp; Mobile Engineer specialising in <strong>hardware-accelerated AI pipelines, 3D digital twins, and offline-first mobile systems</strong>. Skilled in
@@ -494,7 +494,9 @@ export default {
       const phrases = ['_', ' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
       let pi = 0, ci = 0, deleting = false, wait = 0;
       const tick = () => {
-        const phrase = phrases[pi];
+        // On narrow screens the prompt underscore lives next to the ">" (see .prompt-bar),
+        // so the standalone "_" phase is skipped to avoid a duplicate underscore.
+        const phrase = (pi === 0 && window.innerWidth <= 640) ? '' : phrases[pi];
         if (deleting) {
           if (ci > 0) { ci--; el.textContent = phrase.slice(0, ci); wait = 55; }
           else { deleting = false; pi = (pi + 1) % phrases.length; wait = 400; }
@@ -540,7 +542,7 @@ a{color:inherit;text-decoration:none}
 button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 ::selection{background:rgba(52,255,110,0.22);color:var(--text)}
 :focus-visible{outline:2px solid var(--green);outline-offset:3px;border-radius:4px}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.prompt-bar,.cursor-blink{animation:none!important;opacity:1!important}}
 #matrix-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;background:#000;pointer-events:none;}
 .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,.3) 40%,rgba(0,0,0,.5) 100%),radial-gradient(ellipse 80% 60% at 50% 0%,rgba(52,255,110,.05),transparent 70%);}
 .shell{position:relative;z-index:2;width:min(1200px,calc(100% - var(--s8)));margin-inline:auto}
@@ -570,6 +572,7 @@ body.nav-open{overflow:hidden}
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(52,255,110,.4)}}
 .hero-title{font-family:var(--font-mono);font-size:clamp(2.6rem,7vw,6rem);line-height:1.05;letter-spacing:-.02em;color:#f0fff4;margin-bottom:var(--s3);}
 .hero-title .gt{color:var(--green)}
+.prompt-bar{display:none;animation:cursor-pulse 1s step-end infinite}
 .cursor-blink{display:inline-block;width:.55em;height:.9em;background:var(--green);margin-left:.08em;vertical-align:-.05em;border-radius:2px;animation:cursor-pulse 1s step-end infinite;}
 @keyframes cursor-pulse{0%,49%{opacity:1}50%,100%{opacity:0}}
 .hero-sub{font-size:clamp(.95rem,1.6vw,1.15rem);color:var(--muted);line-height:1.75;max-width:68ch;margin-bottom:var(--s8);}
@@ -694,6 +697,8 @@ footer p span{color:var(--green)}
   .hero-label::before{margin-top:.36rem;flex-shrink:0}
   .hero-title{font-size:clamp(2.35rem,11.8vw,3rem);line-height:1.1;min-height:3.3em;letter-spacing:-.04em;font-weight:700;margin-bottom:var(--s4)}
   .hero-title-prefix{display:block}
+  .prompt-bar{display:inline}
+  #typed-text:empty + .cursor-blink{display:none}
   .cursor-blink{width:.3em;margin-left:.04em}
   .hero-sub{font-size:.9rem;line-height:1.72;margin-bottom:var(--s6)}
   .hero-ctas{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:var(--s6)}
