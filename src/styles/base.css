@@ -80,9 +80,6 @@ body.nav-open{overflow:hidden}
 .hero-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse-dot 2s ease-in-out infinite;}
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(52,255,110,.4)}}
 .hero-title{font-family:var(--font-mono);font-size:clamp(2.6rem,7vw,6rem);line-height:1.05;letter-spacing:-.02em;color:#f0fff4;margin-bottom:var(--s3);text-shadow:0 0 60px rgba(52,255,110,.16);}
-/* The typed phrase always starts on its own line, so the headline keeps the
-   same two-line shape no matter which phrase is on screen. */
-.hero-title-prefix{display:block}
 /* Reserve the tallest state so the headline, and everything below it, keeps
    a fixed height while the typing animation runs. */
 @media(min-width:641px){.hero-title{min-height:2.1em}}

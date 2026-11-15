@@ -1,8 +1,8 @@
 import { onBeforeUnmount, onMounted } from 'vue';
 
-// The prefix is a block, so the phrase always starts on its own line and
-// needs no leading separator.
-const PHRASES = ['_', 'AI platforms', '3D digital twins', 'GPU pipelines', 'mobile apps', 'production APIs'];
+// The phrase is typed straight after the prompt, so each one carries the
+// space that separates it from the underscore.
+const PHRASES = ['_', ' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
 const TYPE_MS = 120;
 const DELETE_MS = 55;
 const HOLD_MS = 1800;

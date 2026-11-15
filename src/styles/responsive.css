@@ -27,6 +27,7 @@
   .hero-label{font-size:.58rem;letter-spacing:.12em;line-height:1.5;align-items:flex-start;gap:.45rem}
   .hero-label::before{margin-top:.36rem;flex-shrink:0}
   .hero-title{font-size:clamp(2.35rem,11.8vw,3rem);line-height:1.1;min-height:3.3em;letter-spacing:-.04em;font-weight:700;margin-bottom:var(--s4)}
+  .hero-title-prefix{display:block}
   .prompt-bar{display:inline}
   #typed-text:empty + .cursor-blink{display:none}
   .cursor-blink{width:.3em;margin-left:.04em}
