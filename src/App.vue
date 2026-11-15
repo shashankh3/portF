@@ -619,29 +619,28 @@ export default {
         ctx.fillStyle = 'rgba(0,0,0,0.055)';
         ctx.fillRect(0, 0, W, H);
         ctx.font = SIZE + 'px monospace';
-        ctx.textBaseline = 'top';
         for (let i = 0; i < drops.length; i++) {
           const x = i * SIZE;
           const y = drops[i] * SIZE;
           const r = Math.random();
           const glyph = CHARS[Math.floor(Math.random() * CHARS.length)];
 
-          if (r > 0.975) {
-            // Bright head glyph with a cheap faux-bloom for the phosphor glow.
+          if (r > 0.98) {
+            // Bright head glyph with a faux-bloom for the phosphor glow.
             ctx.font = SIZE + 4 + 'px monospace';
             ctx.fillStyle = 'rgba(52,255,110,0.18)';
             ctx.fillText(glyph, x, y - 2);
             ctx.font = SIZE + 'px monospace';
-            ctx.fillStyle = '#f2fff6';
+            ctx.fillStyle = '#ffffff';
             ctx.fillText(glyph, x, y);
-          } else if (r > 0.93) {
-            ctx.fillStyle = '#b6ffd0';
+          } else if (r > 0.92) {
+            ctx.fillStyle = '#b2ffd6';
             ctx.fillText(glyph, x, y);
-          } else if (r > 0.72) {
+          } else if (r > 0.7) {
             ctx.fillStyle = '#34ff6e';
             ctx.fillText(glyph, x, y);
           } else {
-            ctx.fillStyle = '#12a03c';
+            ctx.fillStyle = '#16a842';
             ctx.fillText(glyph, x, y);
           }
 
@@ -655,9 +654,8 @@ export default {
         ctx.fillStyle = '#000';
         ctx.fillRect(0, 0, W, H);
         ctx.font = SIZE + 'px monospace';
-        ctx.textBaseline = 'top';
         for (let i = 0; i < drops.length; i++) {
-          ctx.fillStyle = Math.random() > 0.75 ? '#34ff6e' : '#12a03c';
+          ctx.fillStyle = Math.random() > 0.75 ? '#34ff6e' : '#16a842';
           ctx.fillText(
             CHARS[Math.floor(Math.random() * CHARS.length)],
             i * SIZE,
@@ -729,8 +727,8 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4dff82,#12a03c)}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.prompt-bar,.cursor-blink{animation:none!important;opacity:1!important}html.reveal-ready [data-reveal]{opacity:1!important;translate:none!important}}
 #matrix-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;background:#000;pointer-events:none;}
-/* Layered backdrop: rain -> vignette -> cursor spotlight -> CRT scanlines */
-.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 75% 58% at 50% 40%,rgba(0,0,0,.66) 0%,rgba(0,0,0,.3) 62%,rgba(0,0,0,.72) 100%),linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,.52) 100%);}
+/* Layered backdrop: rain -> readability scrim + vignette -> cursor spotlight -> CRT scanlines */
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 62% 58% at 50% 46%,rgba(0,0,0,.46) 0%,rgba(0,0,0,.16) 58%,rgba(0,0,0,0) 100%),radial-gradient(ellipse 88% 70% at 50% 42%,rgba(0,0,0,.16) 0%,rgba(0,0,0,0) 72%,rgba(0,0,0,.34) 100%),linear-gradient(180deg,rgba(0,0,0,.24) 0%,rgba(0,0,0,0) 44%,rgba(0,0,0,.26) 100%),radial-gradient(ellipse 80% 60% at 50% 0%,rgba(52,255,110,.05),transparent 70%);}
 .spotlight{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(460px circle at var(--mx,50%) var(--my,30%),rgba(52,255,110,.075),rgba(52,255,110,.02) 45%,transparent 68%);}
 .scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.13) 3px 4px);opacity:.55;}
 .scanlines::after{content:'';position:absolute;left:0;right:0;height:200px;background:linear-gradient(to bottom,transparent,rgba(52,255,110,.035),transparent);animation:scan-sweep 11s linear infinite}
