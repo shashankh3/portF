@@ -1,8 +1,4 @@
 /* Breakpoints, from tablet down to small phones. */
-@media(max-width:1020px){
-  .hero-inner{grid-template-columns:1fr;gap:var(--s8)}
-  .hero-console{max-width:560px}
-}
 @media(max-width:960px){
   .about-grid,.skills-grid{grid-template-columns:1fr}
   .project-grid,.creds-grid{grid-template-columns:1fr}
@@ -31,7 +27,6 @@
   .hero-label{font-size:.58rem;letter-spacing:.12em;line-height:1.5;align-items:flex-start;gap:.45rem}
   .hero-label::before{margin-top:.36rem;flex-shrink:0}
   .hero-title{font-size:clamp(2.35rem,11.8vw,3rem);line-height:1.1;min-height:3.3em;letter-spacing:-.04em;font-weight:700;margin-bottom:var(--s4)}
-  .hero-title-prefix{display:block}
   .prompt-bar{display:inline}
   #typed-text:empty + .cursor-blink{display:none}
   .cursor-blink{width:.3em;margin-left:.04em}
@@ -40,11 +35,6 @@
   .hero-ctas .btn{width:100%;justify-content:center;gap:.45rem;padding:.8rem .6rem;font-size:.68rem;letter-spacing:.05em;border-radius:10px}
   .hero-ctas .btn-prime,.hero-ctas .btn-ghost:last-child{grid-column:1/-1}
   .hero-meta{gap:.5rem;max-width:none;margin-top:.25rem;grid-template-columns:1fr}
-  .hero-console{border-radius:14px}
-  .hc-body{font-size:.7rem;padding:var(--s4) var(--s4) var(--s3)}
-  .hc-row{margin-top:var(--s4)}
-  .hc-foot{font-size:.54rem;padding:.5rem .65rem;gap:.4rem}
-  .hc-foot-right{display:none}
   .meta-item{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;padding:.6rem .85rem;border-radius:10px}
   .meta-item .label{margin-bottom:0;font-size:.6rem;letter-spacing:.1em;white-space:nowrap}
   .meta-item .val{font-size:.82rem;text-align:right}

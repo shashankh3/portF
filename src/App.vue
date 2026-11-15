@@ -78,33 +78,6 @@
               </div>
             </div>
           </div>
-
-          <aside class="hero-console" aria-label="Terminal summary of experience">
-            <div class="hc-bar">
-              <span class="hc-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="hc-title">shashank@dev — ~/portfolio</span>
-              <span class="hc-live"><i aria-hidden="true"></i>live</span>
-            </div>
-            <div class="hc-body">
-              <div class="hc-row"><span class="hc-prompt" aria-hidden="true">❯</span><span class="hc-cmd">whoami</span></div>
-              <div class="hc-out">Shashank Hirwani</div>
-              <div class="hc-out hc-dim">Full-Stack · GenAI · Mobile Engineer</div>
-
-              <div class="hc-row"><span class="hc-prompt" aria-hidden="true">❯</span><span class="hc-cmd">cat focus.txt</span></div>
-              <div class="hc-out">AI pipelines · 3D digital twins</div>
-              <div class="hc-out">offline-first mobile systems</div>
-
-              <div class="hc-row"><span class="hc-prompt" aria-hidden="true">❯</span><span class="hc-cmd">ship --production</span></div>
-              <div class="hc-out hc-ok">✓ 6 projects · 0 vulnerabilities</div>
-
-              <div class="hc-row"><span class="hc-prompt" aria-hidden="true">❯</span><span class="hc-cmd">status</span><span class="hc-caret" aria-hidden="true"></span></div>
-            </div>
-            <div class="hc-foot">
-              <span class="hc-dot" aria-hidden="true"></span>
-              <span>Available for opportunities</span>
-              <span class="hc-foot-right">IN · UTC+5:30</span>
-            </div>
-          </aside>
         </div>
       </section>
 
