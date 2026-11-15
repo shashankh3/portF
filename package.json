@@ -5,15 +5,23 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "deploy": "gh-pages -d dist"
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "core-js": "^3.8.3",
     "vue": "^3.5.45"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
-    "gh-pages": "^6.1.1"
+    "eslint": "^10.15.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "globals": "^17.14.0",
+    "vitest": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }
