@@ -48,7 +48,7 @@ export function useTyping(targetRef) {
   onMounted(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       // No typing animation for users who asked for less motion.
-      setText(PHRASES[1]);
+      setText(PHRASES[0]);
       return;
     }
     timer = setTimeout(tick, START_DELAY_MS);

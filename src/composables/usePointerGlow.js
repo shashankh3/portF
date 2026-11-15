@@ -50,8 +50,13 @@ export function usePointerGlow(spotlightRef) {
   };
 
   onMounted(() => {
-    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Guarded so the composable is safe to call outside a browser (SSR/tests).
+    const canHover =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reduceMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     enabled = canHover && !reduceMotion;
     if (!enabled) return;
 

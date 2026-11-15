@@ -14,7 +14,9 @@ export function useMenu() {
   };
 
   watch(menuOpen, (open) => {
-    document.body.classList.toggle('nav-open', open);
+    if (typeof document !== 'undefined') {
+      document.body.classList.toggle('nav-open', open);
+    }
   });
 
   const onKeydown = (event) => {

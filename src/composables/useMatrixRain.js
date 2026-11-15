@@ -6,7 +6,7 @@ import { onBeforeUnmount, onMounted } from 'vue';
 
 const CHARS = 'アァイィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>{}[]/*+-=|\\:;'.split('');
 const SIZE = 15;
-const FRAME_MS = 40;
+const TARGET_FRAME_MS = 40; // ~25fps visual cadence
 const FADE = 'rgba(0,0,0,0.055)';
 const HEAD_BLOOM = 'rgba(52,255,110,0.18)';
 const COLOR_HEAD = '#ffffff';
@@ -25,20 +25,23 @@ export function useMatrixRain(canvasRef) {
   let drops = [];
   let width = 0;
   let height = 0;
-  let interval = null;
+  let frame = null;
+  let lastFrameTime = 0;
   let lastTick = 0;
   let scale = 1;
   let lag = 0;
   let downgraded = false;
   let warmupUntil = 0;
   let reduceMotion = false;
+  let running = false;
   let motionQuery = null;
 
   // Rendering past ~1.5x gains almost nothing for a soft glow effect while
   // quadrupling the per-frame fill cost of the full-canvas fade.
   const idealScale = () => {
-    const dpr = window.devicePixelRatio || 1;
-    const cap = window.innerWidth < 768 ? 1.25 : 1.5;
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1;
+    const cap =
+      typeof window !== 'undefined' && window.innerWidth < 768 ? 1.25 : 1.5;
     return Math.min(dpr, cap);
   };
 
@@ -59,22 +62,26 @@ export function useMatrixRain(canvasRef) {
     // Follow the device cap unless a struggling device already downgraded.
     if (!downgraded) scale = idealScale();
 
-    const nextWidth = window.innerWidth;
-    const nextHeight = window.innerHeight;
+    const nextWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
+    const nextHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
     const cols = Math.floor(nextWidth / SIZE);
 
     // Rebuild columns only when the grid changed, so a quality downgrade does
     // not make the rain visibly restart.
     if (nextWidth !== width || nextHeight !== height || drops.length !== cols) {
-      drops = Array.from({ length: cols }, () => Math.floor((Math.random() * -nextHeight) / SIZE));
+      drops = Array.from({ length: cols }, () =>
+        Math.floor((Math.random() * -nextHeight) / SIZE)
+      );
     }
     width = nextWidth;
     height = nextHeight;
 
-    canvasRef.value.width = Math.floor(width * scale);
-    canvasRef.value.height = Math.floor(height * scale);
-    canvasRef.value.style.width = `${width}px`;
-    canvasRef.value.style.height = `${height}px`;
+    if (canvasRef.value) {
+      canvasRef.value.width = Math.floor(width * scale);
+      canvasRef.value.height = Math.floor(height * scale);
+      canvasRef.value.style.width = `${width}px`;
+      canvasRef.value.style.height = `${height}px`;
+    }
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
     // A canvas resize clears its bitmap; restore the still frame.
@@ -83,9 +90,11 @@ export function useMatrixRain(canvasRef) {
 
   const draw = () => {
     const now = performance.now();
-    if (now > warmupUntil) {
+    if (now > warmupUntil && lastTick > 0) {
       // Only sustained, severe lag counts as "this device is struggling".
-      lag = lag * LAG_SMOOTHING + Math.max(0, now - lastTick - FRAME_MS) * (1 - LAG_SMOOTHING);
+      lag =
+        lag * LAG_SMOOTHING +
+        Math.max(0, now - lastTick - TARGET_FRAME_MS) * (1 - LAG_SMOOTHING);
       if (!downgraded && lag > LAG_THRESHOLD) {
         downgraded = true;
         // Never below 1x: that would be softer than the original effect.
@@ -129,21 +138,41 @@ export function useMatrixRain(canvasRef) {
     }
   };
 
+  const loop = (timestamp) => {
+    if (!running) return;
+    frame = requestAnimationFrame(loop);
+    const elapsed = timestamp - lastFrameTime;
+    if (elapsed >= TARGET_FRAME_MS) {
+      // Keep steady ~25fps visual cadence without timing drift
+      lastFrameTime = timestamp - (elapsed % TARGET_FRAME_MS);
+      draw();
+    }
+  };
+
   const start = () => {
-    if (interval || reduceMotion) return;
-    lastTick = performance.now();
-    interval = setInterval(draw, FRAME_MS);
+    if (running || reduceMotion) return;
+    running = true;
+    const now = performance.now();
+    lastFrameTime = now;
+    lastTick = now;
+    frame = requestAnimationFrame(loop);
   };
 
   const stop = () => {
-    if (!interval) return;
-    clearInterval(interval);
-    interval = null;
+    if (!running) return;
+    running = false;
+    if (frame) cancelAnimationFrame(frame);
+    frame = null;
   };
 
   const onVisibilityChange = () => {
-    if (document.hidden) stop();
-    else start();
+    if (document.hidden) {
+      stop();
+    } else {
+      lastFrameTime = performance.now();
+      lastTick = performance.now();
+      start();
+    }
   };
 
   const onMotionPreferenceChange = (event) => {
@@ -162,15 +191,20 @@ export function useMatrixRain(canvasRef) {
     ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    reduceMotion = motionQuery.matches;
+    motionQuery =
+      typeof window.matchMedia === 'function'
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    reduceMotion = motionQuery ? motionQuery.matches : false;
     scale = idealScale();
     warmupUntil = performance.now() + WARMUP_MS;
 
     resize();
-    window.addEventListener('resize', resize);
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    if (typeof motionQuery.addEventListener === 'function') {
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('resize', resize);
+      document.addEventListener('visibilitychange', onVisibilityChange);
+    }
+    if (motionQuery && typeof motionQuery.addEventListener === 'function') {
       motionQuery.addEventListener('change', onMotionPreferenceChange);
     }
 
@@ -181,8 +215,10 @@ export function useMatrixRain(canvasRef) {
 
   onBeforeUnmount(() => {
     stop();
-    window.removeEventListener('resize', resize);
-    document.removeEventListener('visibilitychange', onVisibilityChange);
+    if (typeof window.removeEventListener === 'function') {
+      window.removeEventListener('resize', resize);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    }
     if (motionQuery && typeof motionQuery.removeEventListener === 'function') {
       motionQuery.removeEventListener('change', onMotionPreferenceChange);
     }
