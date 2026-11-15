@@ -80,9 +80,9 @@ body.nav-open{overflow:hidden}
 .hero-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse-dot 2s ease-in-out infinite;}
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(52,255,110,.4)}}
 .hero-title{font-family:var(--font-mono);font-size:clamp(2.6rem,7vw,6rem);line-height:1.05;letter-spacing:-.02em;color:#f0fff4;margin-bottom:var(--s3);text-shadow:0 0 60px rgba(52,255,110,.16);}
-/* Reserve the tallest state so the headline, and everything below it, keeps
-   a fixed height while the typing animation runs. */
-@media(min-width:641px){.hero-title{min-height:2.1em}}
+/* Reserve enough height for the prefix plus a wrapped phrase, so the typing
+   animation never collides with the paragraph underneath. */
+@media(min-width:641px){.hero-title{min-height:3em}}
 .hero-title .gt{color:var(--green)}
 .prompt-bar{display:none;animation:cursor-pulse 1s step-end infinite}
 .cursor-blink{display:inline-block;width:.55em;height:.9em;background:var(--green);margin-left:.08em;vertical-align:-.05em;border-radius:2px;animation:cursor-pulse 1s step-end infinite;}
