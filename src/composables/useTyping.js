@@ -1,7 +1,6 @@
-import { onBeforeUnmount, onMounted } from 'vue';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
-// The alternating cursor (.hero-cursor) follows the animating text, so each
-// phrase carries the space that separates it from the prompt ">".
+// Each phrase carries the leading space that separates it from the prompt ">".
 const PHRASES = [' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
 const TYPE_MS = 120;
 const DELETE_MS = 55;
@@ -14,9 +13,11 @@ export function useTyping(targetRef) {
   let phraseIndex = 0;
   let charIndex = 0;
   let deleting = false;
+  const hasText = ref(false);
 
   const setText = (text) => {
     if (targetRef.value) targetRef.value.textContent = text;
+    hasText.value = text.length > 0;
   };
 
   const tick = () => {
@@ -57,4 +58,6 @@ export function useTyping(targetRef) {
   onBeforeUnmount(() => {
     if (timer) clearTimeout(timer);
   });
+
+  return { hasText };
 }

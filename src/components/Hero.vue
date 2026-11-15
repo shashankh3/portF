@@ -5,7 +5,7 @@
         <div class="hero-label">System Online — Available for opportunities</div>
         <h1 id="hero-title" class="hero-title">
           <span class="sr-only">I build AI platforms, 3D digital twins, GPU pipelines, mobile apps, and production APIs.</span>
-          <span class="hero-title-prefix" aria-hidden="true">I build <span class="gt">&gt;</span></span><span id="typed-text" ref="typedText" aria-hidden="true"></span><span class="hero-cursor" aria-hidden="true"><span class="prompt-bar">_</span><span class="cursor-blink"></span></span>
+          <span class="hero-title-prefix" aria-hidden="true">I build <span class="gt">&gt;</span><span v-if="!hasText" class="prompt-bar">_</span></span><span id="typed-text" ref="typedText" aria-hidden="true"></span><span v-if="hasText" class="cursor-blink" aria-hidden="true"></span>
         </h1>
         <p class="hero-sub">
           Full-Stack, GenAI &amp; Mobile Engineer specialising in <strong>hardware-accelerated AI pipelines, 3D digital twins, and offline-first mobile systems</strong>. Skilled in
@@ -51,5 +51,5 @@ defineProps({
 });
 
 const typedText = ref(null);
-useTyping(typedText);
+const { hasText } = useTyping(typedText);
 </script>
