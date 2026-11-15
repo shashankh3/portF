@@ -671,23 +671,29 @@ export default {
       let drops = [], W = 0, H = 0;
       let lastTick = performance.now();
 
-      // Plain instance properties, NOT reactive: these update every frame and
-      // must never trigger a component re-render.
-      this.rainScale = 1;
-      this.rainLag = 0;
-      this.rainDowngraded = false;
-
       // The rain is a soft glow effect, so rendering past ~1.5x gains almost
       // nothing visually while quadrupling the per-frame fill cost of the
       // full-canvas fade. Cap it, and lower the cap further on phones.
       const idealScale = () => {
         const dpr = window.devicePixelRatio || 1;
         const cap = window.innerWidth < 768 ? 1.25 : 1.5;
-        return Math.min(dpr, cap) * this.rainScale;
+        return Math.min(dpr, cap);
       };
 
+      // Plain instance properties, NOT reactive: these update every frame and
+      // must never trigger a component re-render.
+      this.rainScale = idealScale();
+      this.rainLag = 0;
+      this.rainDowngraded = false;
+      // Startup jank (compile, layout, font swap) is not a rendering problem,
+      // so ignore the first few seconds entirely.
+      this.rainWarmupUntil = performance.now() + 4000;
+
       const resize = () => {
-        const scale = idealScale();
+        // Unless we already downgraded for a struggling device, follow the cap
+        // (it changes at the phone/tablet breakpoint).
+        if (!this.rainDowngraded) this.rainScale = idealScale();
+        const scale = this.rainScale;
         const w = window.innerWidth;
         const h = window.innerHeight;
         const cols = Math.floor(w / SIZE);
@@ -710,15 +716,17 @@ export default {
 
       const draw = () => {
         const now = performance.now();
-        // How far behind schedule are we? Sustained lag means the browser is
-        // struggling, so drop the render scale once (one-way: no oscillation).
-        this.rainLag = this.rainLag * 0.85 + Math.max(0, now - lastTick - 40) * 0.15;
-        lastTick = now;
-        if (!this.rainDowngraded && this.rainLag > 14) {
-          this.rainDowngraded = true;
-          this.rainScale = 0.7;
-          resize();
+        if (now > this.rainWarmupUntil) {
+          // How far behind schedule are we? Only sustained, severe lag counts.
+          this.rainLag = this.rainLag * 0.95 + Math.max(0, now - lastTick - 40) * 0.05;
+          if (!this.rainDowngraded && this.rainLag > 40) {
+            this.rainDowngraded = true;
+            // Never fall below 1x - that would be softer than the original.
+            this.rainScale = Math.max(1, Math.min(this.rainScale, 1));
+            resize();
+          }
         }
+        lastTick = now;
 
         ctx.fillStyle = 'rgba(0,0,0,0.055)';
         ctx.fillRect(0, 0, W, H);
@@ -848,7 +856,9 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
    brighter than before at every edge while the text band stays as readable
    as it was originally. */
 .veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 88% 70% at 50% 42%,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 72%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,rgba(0,0,0,.36) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.3) 100%),radial-gradient(ellipse 80% 60% at 50% 0%,rgba(52,255,110,.05),transparent 70%);}
-.spotlight{position:fixed;inset:0;z-index:2;pointer-events:none;background:radial-gradient(460px circle at var(--mx,50%) var(--my,30%),rgba(52,255,110,.075),rgba(52,255,110,.02) 45%,transparent 68%);}
+/* A fixed-size layer moved with transform: tracking the pointer then composites
+   instead of repainting a full-viewport gradient on every mouse move. */
+.spotlight{position:fixed;top:0;left:0;width:920px;height:920px;z-index:2;pointer-events:none;will-change:transform;transform:translate3d(calc(var(--mx,50vw) - 460px),calc(var(--my,30vh) - 460px),0);background:radial-gradient(circle 460px at 50% 50%,rgba(52,255,110,.075),rgba(52,255,110,.02) 45%,transparent 68%);}
 .scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.13) 3px 4px);opacity:.55;}
 .scanlines::after{content:'';position:absolute;left:0;right:0;height:200px;background:linear-gradient(to bottom,transparent,rgba(52,255,110,.035),transparent);animation:scan-sweep 11s linear infinite}
 @keyframes scan-sweep{from{transform:translateY(-200px)}to{transform:translateY(100vh)}}
