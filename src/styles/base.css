@@ -84,8 +84,12 @@ body.nav-open{overflow:hidden}
    animation never collides with the paragraph underneath. */
 @media(min-width:641px){.hero-title{min-height:3em}}
 .hero-title .gt{color:var(--green)}
-.prompt-bar{display:none;animation:cursor-pulse 1s step-end infinite}
-.cursor-blink{display:inline-block;width:.55em;height:.9em;background:var(--green);margin-left:.08em;vertical-align:-.05em;border-radius:2px;animation:cursor-pulse 1s step-end infinite;}
+/* The cursor sits directly after the typed text (and right after > when empty).
+   The white underscore and green block alternate in antiphase, so the two
+   colors blink in rhythm on the animating text without horizontal jitter. */
+.hero-cursor{display:inline-block;position:relative;margin-left:.06em;vertical-align:-.05em;line-height:1}
+.prompt-bar{display:inline-block;color:#f0fff4;line-height:1;text-shadow:0 0 12px rgba(240,255,244,.7);animation:cursor-pulse 1s step-end infinite;animation-delay:-.5s}
+.cursor-blink{position:absolute;left:0;bottom:.08em;width:100%;height:.88em;background:var(--green);border-radius:2px;box-shadow:0 0 14px rgba(52,255,110,.6);animation:cursor-pulse 1s step-end infinite}
 @keyframes cursor-pulse{0%,49%{opacity:1}50%,100%{opacity:0}}
 .hero-sub{font-size:clamp(.95rem,1.6vw,1.15rem);color:var(--muted);line-height:1.75;max-width:68ch;margin-bottom:var(--s8);}
 .hero-sub strong{color:#c8ffda;font-weight:500}

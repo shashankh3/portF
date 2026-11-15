@@ -1,8 +1,8 @@
 import { onBeforeUnmount, onMounted } from 'vue';
 
-// The phrase is typed straight after the prompt, so each one carries the
-// space that separates it from the underscore.
-const PHRASES = ['_', ' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
+// The alternating cursor (.hero-cursor) follows the animating text, so each
+// phrase carries the space that separates it from the prompt ">".
+const PHRASES = [' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'];
 const TYPE_MS = 120;
 const DELETE_MS = 55;
 const HOLD_MS = 1800;
@@ -19,13 +19,8 @@ export function useTyping(targetRef) {
     if (targetRef.value) targetRef.value.textContent = text;
   };
 
-  // On narrow screens the prompt underscore lives next to the ">" (see
-  // .prompt-bar), so the standalone "_" phase is skipped to avoid a duplicate.
-  const currentPhrase = () =>
-    phraseIndex === 0 && window.innerWidth <= 640 ? '' : PHRASES[phraseIndex];
-
   const tick = () => {
-    const phrase = currentPhrase();
+    const phrase = PHRASES[phraseIndex];
     let wait;
 
     if (deleting) {
