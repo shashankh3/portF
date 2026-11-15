@@ -1,7 +1,7 @@
 <template>
   <figure class="pv" :data-testid="`project-video-${id}`">
     <div class="pv-bar">
-      <span class="pv-dots"><i></i><i></i><i></i></span>
+      <span class="pv-dots" aria-hidden="true"><i></i><i></i><i></i></span>
       <span class="pv-url">{{ url }}</span>
     </div>
     <div class="pv-stage">
@@ -15,18 +15,22 @@
         preload="none"
         disablepictureinpicture
         disableremoteplayback
-        :aria-label="`${id} demo recording`"
+        :aria-label="`${label || id} demo recording`"
         @click="toggle"
+        @play="playing = true"
+        @pause="playing = false"
+        @error="failed = true"
       ></video>
       <button
+        v-if="!failed"
         class="pv-btn"
         type="button"
         :aria-label="playing ? 'Pause video' : 'Play video'"
         :data-testid="`project-video-toggle-${id}`"
         @click="toggle"
       >
-        <svg v-if="playing" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-        <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>
+        <svg v-if="playing" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+        <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>
       </button>
     </div>
   </figure>
@@ -35,37 +39,55 @@
 <script>
 export default {
   name: 'ProjectVideo',
-  props: { id: String, src: String, poster: String, url: String },
-  data: () => ({ playing: false, userPaused: false, visible: false, videoSrc: null }),
+  props: {
+    id: { type: String, required: true },
+    label: { type: String, default: '' },
+    src: { type: String, required: true },
+    poster: { type: String, default: '' },
+    url: { type: String, default: '' }
+  },
+  data: () => ({ playing: false, userPaused: false, visible: false, videoSrc: null, failed: false }),
   mounted() {
-    const v = this.$refs.video;
-    if (!v) return;
+    const video = this.$refs.video;
+    if (!video) return;
+
+    // Safari/iOS only honour autoplay when the property (not just the
+    // attribute) is set before play() is called.
+    video.muted = true;
     this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    v.addEventListener('play', () => { this.playing = true; });
-    v.addEventListener('pause', () => { this.playing = false; });
+    if (!('IntersectionObserver' in window)) {
+      this.visible = true;
+      this.load();
+      return;
+    }
 
     // Only pull the video bytes once the card is near the viewport. Without
     // this every clip is fetched during initial page load.
-    this.lazyObserver = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
+    this.lazyObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
         this.load();
         if (this.lazyObserver) this.lazyObserver.disconnect();
-      }
-    }, { rootMargin: '400px 0px' });
+      },
+      { rootMargin: '400px 0px' }
+    );
     this.lazyObserver.observe(this.$el);
 
-    this.observer = new IntersectionObserver(([e]) => {
-      this.visible = e.isIntersecting;
-      if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
-      else if (!this.visible) v.pause();
-    }, { threshold: 0.5 });
-    this.observer.observe(v);
+    this.observer = new IntersectionObserver(
+      ([entry]) => {
+        this.visible = entry.isIntersecting;
+        if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
+        else if (!this.visible) video.pause();
+      },
+      { threshold: 0.5 }
+    );
+    this.observer.observe(video);
 
     // A backgrounded tab should not keep decoding frames.
     this.visibilityHandler = () => {
       if (document.hidden) {
-        v.pause();
+        video.pause();
       } else if (this.visible && !this.userPaused && !this.reduceMotion) {
         this.play();
       }
@@ -76,44 +98,52 @@ export default {
     if (this.observer) this.observer.disconnect();
     if (this.lazyObserver) this.lazyObserver.disconnect();
     if (this.visibilityHandler) document.removeEventListener('visibilitychange', this.visibilityHandler);
-    const v = this.$refs.video;
-    if (v) {
-      v.pause();
-      v.removeAttribute('src');
-      v.load();
+    const video = this.$refs.video;
+    if (video) {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
     }
   },
   methods: {
     load() {
       if (this.videoSrc) return;
-      const v = this.$refs.video;
-      if (v) v.preload = 'metadata';
       // null -> the src attribute is absent until we actually need the bytes.
       this.videoSrc = this.src;
-      if (v) v.load();
-      // The clip may have become visible before it was fetched.
-      if (this.visible && !this.userPaused && !this.reduceMotion) {
-        this.$nextTick(() => this.play());
-      }
+      this.$nextTick(() => {
+        const video = this.$refs.video;
+        if (!video) return;
+        video.preload = 'metadata';
+        video.load();
+        // The clip may have become visible before it was fetched.
+        if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
+      });
     },
     play() {
-      const v = this.$refs.video;
-      if (!v) return;
-      if (!this.videoSrc) { this.load(); return; }
-      const p = v.play();
-      if (p && typeof p.catch === 'function') p.catch(() => {});
-    },
-    toggle() {
-      const v = this.$refs.video;
-      if (!v) return;
+      const video = this.$refs.video;
+      if (!video || this.failed) return;
       if (!this.videoSrc) {
         this.load();
-        this.userPaused = false;
-        this.play();
         return;
       }
-      if (v.paused) { this.userPaused = false; this.play(); }
-      else { this.userPaused = true; v.pause(); }
+      const result = video.play();
+      if (result && typeof result.catch === 'function') result.catch(() => {});
+    },
+    toggle() {
+      const video = this.$refs.video;
+      if (!video || this.failed) return;
+      if (!this.videoSrc) {
+        this.userPaused = false;
+        this.load();
+        return;
+      }
+      if (video.paused) {
+        this.userPaused = false;
+        this.play();
+      } else {
+        this.userPaused = true;
+        video.pause();
+      }
     }
   }
 };

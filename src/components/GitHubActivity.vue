@@ -3,7 +3,7 @@
     <!-- Header with GitHub Icon, Total Count & Year Selector -->
     <div class="gh-top-bar">
       <div class="gh-top-left">
-        <svg class="gh-logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <svg class="gh-logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
           <path d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.478-10-10-10z"/>
         </svg>
         <div>
@@ -12,7 +12,7 @@
             <span class="gh-subhead">contributions in {{ selectedYear }}</span>
           </div>
           <div class="gh-user-handle">
-            <span class="gh-status-dot"></span>
+            <span class="gh-status-dot" aria-hidden="true"></span>
             <span>github.com/shashankh3</span>
           </div>
         </div>
@@ -26,6 +26,8 @@
           type="button"
           class="gh-year-btn"
           :class="{ active: selectedYear === year }"
+          :aria-pressed="selectedYear === year"
+          :aria-label="`Show contributions for ${year}`"
           @click="selectYear(year)"
         >
           {{ year }}
@@ -35,7 +37,7 @@
 
     <!-- GitHub Exact Calendar Box Container -->
     <div class="gh-calendar-box">
-      <div class="gh-calendar-scroll" ref="scrollContainer">
+      <div class="gh-calendar-scroll" aria-hidden="true">
         <div class="gh-grid-wrapper">
           <!-- Month Labels Header -->
           <div class="gh-months-row">
@@ -89,7 +91,7 @@
         <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="gh-learn-link">
           View full profile on GitHub ↗
         </a>
-        <div class="gh-legend">
+        <div class="gh-legend" aria-hidden="true">
           <span>Less</span>
           <span class="gh-legend-sq level-0" title="No contributions"></span>
           <span class="gh-legend-sq level-1" title="1-3 contributions"></span>
@@ -121,6 +123,7 @@
     <div
       v-if="tooltip.visible"
       class="gh-tooltip"
+      aria-hidden="true"
       :style="{ left: `${tooltip.x}px`, top: `${tooltip.y}px` }"
     >
       {{ tooltip.text }}
@@ -129,15 +132,31 @@
 </template>
 
 <script>
-import defaultContributions from '@/assets/github-contributions.json';
+import defaultPayload from '@/assets/github-contributions.json';
+import {
+  buildMonthHeaders,
+  buildWeeks,
+  collectYears,
+  contributionsForYear,
+  formatDayLabel,
+  sanitizePayload,
+  totalForYear
+} from '@/utils/contributions';
+
+const LIVE_ENDPOINT = 'https://github-contributions-api.jogruber.de/v4/shashankh3';
+const FETCH_TIMEOUT_MS = 8000;
+
+const bundledData = sanitizePayload(defaultPayload) || { contributions: [], total: {} };
+const bundledYears = collectYears(bundledData);
 
 export default {
   name: 'GitHubActivity',
   data() {
     return {
-      contributionsData: defaultContributions,
-      selectedYear: '2026',
-      availableYears: ['2026', '2025', '2024', '2023', '2022'],
+      // Bundled snapshot renders instantly; the live fetch only replaces it
+      // when it succeeds and passes validation.
+      contributionsData: bundledData,
+      selectedYear: bundledYears[0] || String(new Date().getFullYear()),
       tooltip: {
         visible: false,
         text: '',
@@ -147,133 +166,74 @@ export default {
     };
   },
   computed: {
+    availableYears() {
+      return collectYears(this.contributionsData);
+    },
     yearContributions() {
-      const yearPrefix = `${this.selectedYear}-`;
-      const allContribs = this.contributionsData.contributions || [];
-      return allContribs.filter(c => c.date.startsWith(yearPrefix));
+      return contributionsForYear(this.contributionsData.contributions, this.selectedYear);
     },
     totalContributions() {
-      if (this.contributionsData.total && this.contributionsData.total[this.selectedYear] !== undefined) {
-        return this.contributionsData.total[this.selectedYear];
-      }
-      return this.yearContributions.reduce((acc, c) => acc + (c.count || 0), 0);
+      return totalForYear(this.contributionsData.total, this.selectedYear, this.yearContributions);
     },
     maxDayCount() {
       if (!this.yearContributions.length) return 0;
-      return Math.max(...this.yearContributions.map(c => c.count || 0));
+      return Math.max(...this.yearContributions.map((day) => day.count || 0));
     },
     activeDaysCount() {
-      return this.yearContributions.filter(c => (c.count || 0) > 0).length;
+      return this.yearContributions.filter((day) => (day.count || 0) > 0).length;
     },
     weeksData() {
-      const yr = parseInt(this.selectedYear, 10);
-      const d0 = new Date(yr, 0, 1);
-      const d1 = new Date(yr, 11, 31);
-
-      // Map date string -> day info
-      const dayMap = {};
-      this.yearContributions.forEach(c => {
-        dayMap[c.date] = c;
-      });
-
-      const weeks = [];
-      let currentWeek = [];
-
-      // Sunday = 0, Monday = 1, ... Saturday = 6
-      const startDow = d0.getDay();
-      for (let i = 0; i < startDow; i++) {
-        currentWeek.push(null);
-      }
-
-      const curr = new Date(d0);
-      while (curr <= d1) {
-        const y = curr.getFullYear();
-        const m = String(curr.getMonth() + 1).padStart(2, '0');
-        const d = String(curr.getDate()).padStart(2, '0');
-        const dateStr = `${y}-${m}-${d}`;
-
-        const dayInfo = dayMap[dateStr] || { date: dateStr, count: 0, level: 0 };
-        currentWeek.push(dayInfo);
-
-        if (currentWeek.length === 7) {
-          weeks.push(currentWeek);
-          currentWeek = [];
-        }
-        curr.setDate(curr.getDate() + 1);
-      }
-
-      if (currentWeek.length > 0) {
-        while (currentWeek.length < 7) {
-          currentWeek.push(null);
-        }
-        weeks.push(currentWeek);
-      }
-
-      return weeks;
+      return buildWeeks(Number(this.selectedYear), this.yearContributions);
     },
     monthHeaders() {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      const headers = [];
-      const yr = parseInt(this.selectedYear, 10);
-
-      months.forEach((mName, mIdx) => {
-        const targetDate = new Date(yr, mIdx, 1);
-        const y = targetDate.getFullYear();
-        const m = String(targetDate.getMonth() + 1).padStart(2, '0');
-        const d = String(targetDate.getDate()).padStart(2, '0');
-        const dateStr = `${y}-${m}-${d}`;
-
-        // Find which column (week index) contains this day
-        const colIdx = this.weeksData.findIndex(week => week.some(day => day && day.date === dateStr));
-        if (colIdx !== -1) {
-          headers.push({ name: mName, col: colIdx });
-        }
-      });
-
-      return headers;
+      return buildMonthHeaders(Number(this.selectedYear), this.weeksData);
     }
   },
   mounted() {
     this.fetchLiveContributions();
   },
+  beforeUnmount() {
+    if (this.abortController) this.abortController.abort();
+  },
   methods: {
     selectYear(year) {
       this.selectedYear = year;
+      this.tooltip.visible = false;
     },
     async fetchLiveContributions() {
+      const controller = new AbortController();
+      this.abortController = controller;
+      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
       try {
-        const res = await fetch('https://github-contributions-api.jogruber.de/v4/shashankh3');
-        if (res.ok) {
-          const freshData = await res.json();
-          if (freshData && freshData.contributions) {
-            this.contributionsData = freshData;
-          }
+        const response = await fetch(LIVE_ENDPOINT, {
+          signal: controller.signal,
+          headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) return;
+
+        const payload = sanitizePayload(await response.json());
+        if (!payload) return;
+
+        this.contributionsData = payload;
+        const years = collectYears(payload);
+        if (!years.includes(this.selectedYear)) {
+          this.selectedYear = years[0] || this.selectedYear;
         }
-      } catch (err) {
-        // Silently keep using default bundled data
+      } catch {
+        // Offline, blocked or timed out: keep the bundled snapshot.
+      } finally {
+        clearTimeout(timeout);
+        if (this.abortController === controller) this.abortController = null;
       }
     },
-    showTooltip(e, day) {
-      const rect = e.target.getBoundingClientRect();
+    showTooltip(event, day) {
+      const rect = event.target.getBoundingClientRect();
       const parentRect = this.$el.getBoundingClientRect();
-
-      const parts = day.date.split('-');
-      const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-      const dateFormatted = dObj.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      });
-
-      const countText = day.count === 0
-        ? 'No contributions'
-        : day.count === 1
-        ? '1 contribution'
-        : `${day.count} contributions`;
 
       this.tooltip = {
         visible: true,
-        text: `${countText} on ${dateFormatted}`,
+        text: formatDayLabel(day),
         x: rect.left - parentRect.left + rect.width / 2,
         y: rect.top - parentRect.top - 32
       };
@@ -284,6 +244,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .github-activity-card {
