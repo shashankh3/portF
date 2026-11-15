@@ -47,7 +47,7 @@ export default {
     }, { threshold: 0.5 });
     this.observer.observe(v);
   },
-  beforeUnmount() { this.observer.disconnect(); },
+  beforeUnmount() { if (this.observer) this.observer.disconnect(); },
   methods: {
     toggle() {
       const v = this.$refs.video;
