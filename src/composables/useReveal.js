@@ -1,7 +1,7 @@
 import { onBeforeUnmount, onMounted } from 'vue';
 
-const STAGGER_MS = 80;
-const MAX_STAGGER_STEPS = 6;
+const STAGGER_MS = 40;
+const MAX_STAGGER_STEPS = 3;
 
 export function useReveal(rootRef) {
   let observer = null;
@@ -39,7 +39,9 @@ export function useReveal(rootRef) {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0, rootMargin: '0px 0px -60px 0px' }
+      // Reveal as soon as any part of the element is on screen, so text is
+      // never withheld from a reader who is already looking at it.
+      { threshold: 0, rootMargin: '0px 0px -8px 0px' }
     );
 
     items.forEach((el) => observer.observe(el));

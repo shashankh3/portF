@@ -79,7 +79,7 @@
             </div>
           </div>
 
-          <aside class="hero-console" data-reveal aria-label="Terminal summary of experience">
+          <aside class="hero-console" aria-label="Terminal summary of experience">
             <div class="hc-bar">
               <span class="hc-dots" aria-hidden="true"><i></i><i></i><i></i></span>
               <span class="hc-title">shashank@dev — ~/portfolio</span>

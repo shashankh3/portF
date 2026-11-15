@@ -80,6 +80,11 @@ body.nav-open{overflow:hidden}
 .hero-label::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);animation:pulse-dot 2s ease-in-out infinite;}
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 6px var(--green)}50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(52,255,110,.4)}}
 .hero-title{font-family:var(--font-mono);font-size:clamp(2.6rem,7vw,6rem);line-height:1.05;letter-spacing:-.02em;color:#f0fff4;margin-bottom:var(--s3);text-shadow:0 0 60px rgba(52,255,110,.16);}
+/* The typing animation rewraps the headline between one and three lines.
+   Reserve the tallest state so the hero column keeps a fixed height: the
+   headline, the paragraph below it and the terminal panel beside it all
+   stay put instead of jumping as each character lands. */
+@media(min-width:641px){.hero-title{min-height:3.15em}}
 .hero-title .gt{color:var(--green)}
 .prompt-bar{display:none;animation:cursor-pulse 1s step-end infinite}
 .cursor-blink{display:inline-block;width:.55em;height:.9em;background:var(--green);margin-left:.08em;vertical-align:-.05em;border-radius:2px;animation:cursor-pulse 1s step-end infinite;}
@@ -101,8 +106,10 @@ body.nav-open{overflow:hidden}
 .meta-item .label{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:.25rem;}
 .meta-item .val{font-size:.9rem;color:#d8ffdf;font-weight:500}
 /* Terminal console panel */
-.hero-console{border-radius:16px;overflow:hidden;border:1px solid rgba(52,255,110,.26);background:rgba(2,10,5,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 44px rgba(52,255,110,.07),inset 0 1px 0 rgba(52,255,110,.12);transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out),transform .3s var(--ease-out);--reveal-delay:140ms}
-.hero-console:hover{border-color:rgba(52,255,110,.5);box-shadow:0 28px 80px rgba(0,0,0,.7),0 0 56px rgba(52,255,110,.13),inset 0 1px 0 rgba(52,255,110,.16);transform:translateY(-3px)}
+.hero-console{border-radius:16px;overflow:hidden;border:1px solid rgba(52,255,110,.26);background:rgba(2,10,5,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 44px rgba(52,255,110,.07),inset 0 1px 0 rgba(52,255,110,.12);transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out)}
+/* No hover lift here: the console sits beside the hero copy, and a box that
+   rises on hover and falls back reads as jitter rather than polish. */
+.hero-console:hover{border-color:rgba(52,255,110,.5);box-shadow:0 28px 80px rgba(0,0,0,.7),0 0 56px rgba(52,255,110,.13),inset 0 1px 0 rgba(52,255,110,.16)}
 .hc-bar{display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;background:rgba(255,255,255,.035);border-bottom:1px solid rgba(52,255,110,.14)}
 .hc-dots{display:flex;gap:.32rem}
 .hc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.14)}
