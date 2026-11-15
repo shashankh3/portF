@@ -1,6 +1,5 @@
 <template>
   <div>
-    <a href="#main" class="skip-link">Skip to main content</a>
     <canvas id="matrix-canvas" ref="matrixCanvas" aria-hidden="true"></canvas>
     <div class="veil"></div>
     <div ref="spotlight" class="spotlight" aria-hidden="true"></div>
