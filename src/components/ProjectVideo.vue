@@ -7,12 +7,14 @@
     <div class="pv-stage">
       <video
         ref="video"
-        :src="src"
+        :src="videoSrc"
         :poster="poster"
         muted
         loop
         playsinline
-        preload="metadata"
+        preload="none"
+        disablepictureinpicture
+        disableremoteplayback
         :aria-label="`${id} demo recording`"
         @click="toggle"
       ></video>
@@ -34,25 +36,83 @@
 export default {
   name: 'ProjectVideo',
   props: { id: String, src: String, poster: String, url: String },
-  data: () => ({ playing: false, userPaused: false, visible: false }),
+  data: () => ({ playing: false, userPaused: false, visible: false, videoSrc: null }),
   mounted() {
     const v = this.$refs.video;
     if (!v) return;
+    this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
     v.addEventListener('play', () => { this.playing = true; });
     v.addEventListener('pause', () => { this.playing = false; });
+
+    // Only pull the video bytes once the card is near the viewport. Without
+    // this every clip is fetched during initial page load.
+    this.lazyObserver = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        this.load();
+        if (this.lazyObserver) this.lazyObserver.disconnect();
+      }
+    }, { rootMargin: '400px 0px' });
+    this.lazyObserver.observe(this.$el);
+
     this.observer = new IntersectionObserver(([e]) => {
       this.visible = e.isIntersecting;
-      if (this.visible && !this.userPaused) v.play().catch(() => {});
+      if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
       else if (!this.visible) v.pause();
     }, { threshold: 0.5 });
     this.observer.observe(v);
+
+    // A backgrounded tab should not keep decoding frames.
+    this.visibilityHandler = () => {
+      if (document.hidden) {
+        v.pause();
+      } else if (this.visible && !this.userPaused && !this.reduceMotion) {
+        this.play();
+      }
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
   },
-  beforeUnmount() { if (this.observer) this.observer.disconnect(); },
+  beforeUnmount() {
+    if (this.observer) this.observer.disconnect();
+    if (this.lazyObserver) this.lazyObserver.disconnect();
+    if (this.visibilityHandler) document.removeEventListener('visibilitychange', this.visibilityHandler);
+    const v = this.$refs.video;
+    if (v) {
+      v.pause();
+      v.removeAttribute('src');
+      v.load();
+    }
+  },
   methods: {
+    load() {
+      if (this.videoSrc) return;
+      const v = this.$refs.video;
+      if (v) v.preload = 'metadata';
+      // null -> the src attribute is absent until we actually need the bytes.
+      this.videoSrc = this.src;
+      if (v) v.load();
+      // The clip may have become visible before it was fetched.
+      if (this.visible && !this.userPaused && !this.reduceMotion) {
+        this.$nextTick(() => this.play());
+      }
+    },
+    play() {
+      const v = this.$refs.video;
+      if (!v) return;
+      if (!this.videoSrc) { this.load(); return; }
+      const p = v.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    },
     toggle() {
       const v = this.$refs.video;
       if (!v) return;
-      if (v.paused) { this.userPaused = false; v.play().catch(() => {}); }
+      if (!this.videoSrc) {
+        this.load();
+        this.userPaused = false;
+        this.play();
+        return;
+      }
+      if (v.paused) { this.userPaused = false; this.play(); }
       else { this.userPaused = true; v.pause(); }
     }
   }

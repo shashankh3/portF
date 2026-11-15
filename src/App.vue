@@ -7,7 +7,7 @@
 
     <div class="nav-overlay" :class="{ 'is-open': menuOpen }" aria-hidden="true" @click="closeMenu"></div>
     <nav>
-      <div class="scroll-progress" :style="{ transform: 'scaleX(' + scrollProgress + ')' }" aria-hidden="true"></div>
+      <div class="scroll-progress" ref="scrollProgressBar" aria-hidden="true"></div>
       <div class="nav-inner">
         <div class="nav-logo">
           <img src="/favicon.svg" alt="Tara Yantra" class="nav-yantra-icon" />
@@ -234,7 +234,8 @@
           </div>
         </div>
 
-        <GitHubActivity />
+        <div ref="ghSentinel" class="gh-sentinel" aria-hidden="true"></div>
+        <GitHubActivity v-if="ghReady" />
       </section>
 
       <section id="experience" data-reveal>
@@ -426,11 +427,15 @@
 
 <script>
 import ProjectVideo from './components/ProjectVideo.vue';
-import GitHubActivity from './components/GitHubActivity.vue';
 
 export default {
   name: 'App',
-  components: { ProjectVideo, GitHubActivity },
+  components: {
+    ProjectVideo,
+    // Loaded on demand: keeps the 77KB contribution dataset out of the
+    // initial bundle so it cannot delay first paint.
+    GitHubActivity: () => import('./components/GitHubActivity.vue')
+  },
   data: () => ({
     showBackToTop: false,
     menuOpen: false,
@@ -443,8 +448,14 @@ export default {
     pointerHandler: null,
     revealObserver: null,
     rafId: null,
-    scrollProgress: 0,
-    activeSection: ''
+    scrollRaf: null,
+    offsetRaf: null,
+    resizeObserver: null,
+    activeSection: '',
+    ghReady: false,
+    sectionIds: ['work', 'experience', 'stack', 'contact'],
+    sectionOffsets: [],
+    maxScroll: 1
   }),
   watch: {
     menuOpen(open) {
@@ -462,9 +473,30 @@ export default {
     };
     this.menuResizeHandler = () => {
       if (this.menuOpen && window.innerWidth > 760) this.closeMenu();
+      this.cacheSectionOffsets();
     };
     window.addEventListener('keydown', this.keyHandler);
     window.addEventListener('resize', this.menuResizeHandler);
+    window.addEventListener('orientationchange', this.menuResizeHandler);
+
+    // Section offsets shift as content reveals and videos load, so re-measure
+    // whenever the page height changes.
+    if ('ResizeObserver' in window) {
+      this.resizeObserver = new ResizeObserver(() => this.cacheSectionOffsets());
+      this.resizeObserver.observe(document.body);
+    }
+
+    // The contribution widget ships a large dataset in its own chunk. Hold
+    // that chunk back until the user scrolls near it.
+    if (this.$refs.ghSentinel && 'IntersectionObserver' in window) {
+      this.ghObserver = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) {
+          this.ghReady = true;
+          this.ghObserver.disconnect();
+        }
+      }, { rootMargin: '900px 0px' });
+      this.ghObserver.observe(this.$refs.ghSentinel);
+    }
   },
   beforeUnmount() {
     if (this.scrollHandler) {
@@ -476,11 +508,15 @@ export default {
     if (this.matrixInterval) {
       clearInterval(this.matrixInterval);
     }
+    if (this.rainVisibilityHandler) {
+      document.removeEventListener('visibilitychange', this.rainVisibilityHandler);
+    }
     if (this.keyHandler) {
       window.removeEventListener('keydown', this.keyHandler);
     }
     if (this.menuResizeHandler) {
       window.removeEventListener('resize', this.menuResizeHandler);
+      window.removeEventListener('orientationchange', this.menuResizeHandler);
     }
     if (this.typingTimer) {
       clearTimeout(this.typingTimer);
@@ -491,8 +527,20 @@ export default {
     if (this.revealObserver) {
       this.revealObserver.disconnect();
     }
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.ghObserver) {
+      this.ghObserver.disconnect();
+    }
     if (this.rafId) {
       cancelAnimationFrame(this.rafId);
+    }
+    if (this.scrollRaf) {
+      cancelAnimationFrame(this.scrollRaf);
+    }
+    if (this.offsetRaf) {
+      cancelAnimationFrame(this.offsetRaf);
     }
     document.documentElement.classList.remove('reveal-ready');
     document.body.classList.remove('nav-open');
@@ -506,29 +554,53 @@ export default {
       document.body.classList.remove('nav-open');
     },
     initScrollListener() {
+      this.cacheSectionOffsets();
       this.scrollHandler = () => {
-        this.showBackToTop = window.scrollY > 400;
-        this.updateScrollState();
+        // Scroll events fire far more often than the compositor paints.
+        // Coalesce into a single rAF so we do at most one update per frame.
+        if (this.scrollRaf) return;
+        this.scrollRaf = requestAnimationFrame(() => {
+          this.scrollRaf = null;
+          this.updateScrollState();
+        });
       };
       window.addEventListener('scroll', this.scrollHandler, { passive: true });
       this.updateScrollState();
     },
+    cacheSectionOffsets() {
+      // Debounced: measuring forces layout, so never do it more than once a frame.
+      if (this.offsetRaf) return;
+      this.offsetRaf = requestAnimationFrame(() => {
+        this.offsetRaf = null;
+        this.sectionOffsets = this.sectionIds.map((id) => {
+          const el = document.getElementById(id);
+          return el ? el.getBoundingClientRect().top + window.scrollY : Infinity;
+        });
+        this.maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        // Re-evaluate the scroll spy now that offsets are known.
+        this.updateScrollState();
+      });
+    },
     updateScrollState() {
       const y = window.scrollY;
-      const doc = document.documentElement;
-      const max = doc.scrollHeight - window.innerHeight;
+      this.showBackToTop = y > 400;
 
-      this.scrollProgress = max > 0 ? Math.min(1, Math.max(0, y / max)) : 0;
+      // Write the progress bar transform straight to the DOM. Binding it to a
+      // reactive property would re-render this whole component every frame.
+      const bar = this.$refs.scrollProgressBar;
+      if (bar) {
+        const p = Math.min(1, Math.max(0, y / this.maxScroll));
+        bar.style.transform = 'scaleX(' + p + ')';
+      }
 
-      // Scroll spy: highlight the nav item for the section currently in view.
-      const ids = ['work', 'experience', 'stack', 'contact'];
-      const threshold = 160;
+      // Scroll spy against cached offsets - no layout reads while scrolling.
       let current = '';
-      ids.forEach((id) => {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= threshold) current = id;
-      });
-      if (max > 0 && y >= max - 6) current = ids[ids.length - 1];
+      for (let i = 0; i < this.sectionOffsets.length; i++) {
+        if (y + 160 >= this.sectionOffsets[i]) current = this.sectionIds[i];
+      }
+      if (y >= this.maxScroll - 6 && this.sectionIds.length) {
+        current = this.sectionIds[this.sectionIds.length - 1];
+      }
       if (current !== this.activeSection) this.activeSection = current;
     },
     initReveal() {
@@ -597,25 +669,57 @@ export default {
       const SIZE = 15;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let drops = [], W = 0, H = 0;
+      let lastTick = performance.now();
+
+      // Plain instance properties, NOT reactive: these update every frame and
+      // must never trigger a component re-render.
+      this.rainScale = 1;
+      this.rainLag = 0;
+      this.rainDowngraded = false;
+
+      // The rain is a soft glow effect, so rendering past ~1.5x gains almost
+      // nothing visually while quadrupling the per-frame fill cost of the
+      // full-canvas fade. Cap it, and lower the cap further on phones.
+      const idealScale = () => {
+        const dpr = window.devicePixelRatio || 1;
+        const cap = window.innerWidth < 768 ? 1.25 : 1.5;
+        return Math.min(dpr, cap) * this.rainScale;
+      };
 
       const resize = () => {
-        // Render at device pixel ratio so glyphs stay crisp on retina screens.
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        W = window.innerWidth;
-        H = window.innerHeight;
-        canvas.width = Math.floor(W * dpr);
-        canvas.height = Math.floor(H * dpr);
+        const scale = idealScale();
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const cols = Math.floor(w / SIZE);
+        // Only rebuild the columns when the grid actually changed, so a
+        // quality downgrade does not make the rain visibly restart.
+        if (w !== W || h !== H || drops.length !== cols) {
+          drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -h / SIZE));
+        }
+        W = w;
+        H = h;
+        canvas.width = Math.floor(W * scale);
+        canvas.height = Math.floor(H * scale);
         canvas.style.width = W + 'px';
         canvas.style.height = H + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const cols = Math.floor(W / SIZE);
-        drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -H / SIZE));
+        ctx.setTransform(scale, 0, 0, scale, 0, 0);
       };
       resize();
       this.resizeHandler = resize;
       window.addEventListener('resize', resize);
 
       const draw = () => {
+        const now = performance.now();
+        // How far behind schedule are we? Sustained lag means the browser is
+        // struggling, so drop the render scale once (one-way: no oscillation).
+        this.rainLag = this.rainLag * 0.85 + Math.max(0, now - lastTick - 40) * 0.15;
+        lastTick = now;
+        if (!this.rainDowngraded && this.rainLag > 14) {
+          this.rainDowngraded = true;
+          this.rainScale = 0.7;
+          resize();
+        }
+
         ctx.fillStyle = 'rgba(0,0,0,0.055)';
         ctx.fillRect(0, 0, W, H);
         ctx.font = SIZE + 'px monospace';
@@ -666,6 +770,18 @@ export default {
       }
 
       this.matrixInterval = setInterval(draw, 40);
+
+      // Stop burning frames on a backgrounded tab.
+      this.rainVisibilityHandler = () => {
+        if (document.hidden) {
+          clearInterval(this.matrixInterval);
+          this.matrixInterval = null;
+        } else if (!this.matrixInterval) {
+          lastTick = performance.now();
+          this.matrixInterval = setInterval(draw, 40);
+        }
+      };
+      document.addEventListener('visibilitychange', this.rainVisibilityHandler);
     },
     initTyping() {
       const el = document.getElementById('typed-text');
@@ -782,7 +898,7 @@ body.nav-open{overflow:hidden}
 .btn-prime{background:linear-gradient(135deg,#34ff6e 0%,#15cf4e 100%);border:1px solid #57ff8a;color:#031c0a!important;box-shadow:0 0 24px rgba(52,255,110,.45),0 4px 14px rgba(0,0,0,.5);}
 .btn-prime:hover{background:linear-gradient(135deg,#54ff87 0%,#24df61 100%);box-shadow:0 0 35px rgba(52,255,110,.75),0 6px 22px rgba(0,0,0,.6);color:#021407!important;}
 .btn-prime:hover svg{transform:translateX(3px)}
-.btn-ghost{background:rgba(52,255,110,.08);border:1px solid rgba(52,255,110,.42);color:#eafff0!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 0 12px rgba(52,255,110,.06);}
+.btn-ghost{background:rgba(52,255,110,.11);border:1px solid rgba(52,255,110,.42);color:#eafff0!important;box-shadow:0 4px 16px rgba(0,0,0,.4),inset 0 0 12px rgba(52,255,110,.06);}
 .btn-ghost:hover{background:rgba(52,255,110,.2);border-color:#34ff6e;color:#34ff6e!important;box-shadow:0 0 24px rgba(52,255,110,.4),0 6px 20px rgba(0,0,0,.6);}
 .btn-ghost:hover svg{transform:scale(1.15)}
 .hero-meta{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3);max-width:560px;}
@@ -790,7 +906,7 @@ body.nav-open{overflow:hidden}
 .meta-item .label{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-bottom:.25rem;}
 .meta-item .val{font-size:.9rem;color:#d8ffdf;font-weight:500}
 /* Terminal console panel */
-.hero-console{border-radius:16px;overflow:hidden;border:1px solid rgba(52,255,110,.26);background:rgba(2,10,5,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 44px rgba(52,255,110,.07),inset 0 1px 0 rgba(52,255,110,.12);transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out),transform .3s var(--ease-out)}
+.hero-console{border-radius:16px;overflow:hidden;border:1px solid rgba(52,255,110,.26);background:rgba(2,10,5,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 24px 70px rgba(0,0,0,.6),0 0 44px rgba(52,255,110,.07),inset 0 1px 0 rgba(52,255,110,.12);transition:border-color .3s var(--ease-out),box-shadow .3s var(--ease-out),transform .3s var(--ease-out)}
 .hero-console:hover{border-color:rgba(52,255,110,.5);box-shadow:0 28px 80px rgba(0,0,0,.7),0 0 56px rgba(52,255,110,.13),inset 0 1px 0 rgba(52,255,110,.16);transform:translateY(-3px)}
 .hc-bar{display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;background:rgba(255,255,255,.035);border-bottom:1px solid rgba(52,255,110,.14)}
 .hc-dots{display:flex;gap:.32rem}
@@ -817,7 +933,8 @@ section{padding:clamp(var(--s12),6vw,var(--s16)) 0}
 .section-tag::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
 h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:#edfff2;margin-bottom:var(--s2);line-height:1.15;}
 .section-desc{color:var(--muted);max-width:64ch;margin-bottom:var(--s10);line-height:1.75}
-.glass{position:relative;isolation:isolate;background:var(--surface);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out),transform .25s var(--ease-out);}
+.gh-sentinel{height:1px;width:100%}
+.glass{position:relative;isolation:isolate;background:var(--surface);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out),transform .25s var(--ease-out);}
 /* Cursor-tracking sheen (sits behind the card content) */
 .glass::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(340px circle at var(--cx,50%) var(--cy,-10%),rgba(52,255,110,.14),transparent 62%),linear-gradient(135deg,rgba(52,255,110,.06) 0%,transparent 50%);}
 /* HUD corner brackets */
@@ -888,12 +1005,12 @@ html.reveal-ready [data-reveal].is-visible{opacity:1;translate:0 0}
 .contact-headline{font-size:clamp(1.5rem,3.5vw,2.8rem);letter-spacing:-.03em;color:#e8fff3;margin-bottom:var(--s4);line-height:1.15}
 .contact-sub{color:var(--muted);margin-bottom:var(--s8);max-width:48ch;margin-inline:auto;line-height:1.75}
 .contact-links{display:flex;flex-wrap:wrap;gap:var(--s4);justify-content:center}
-.contact-link{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.3rem;border-radius:8px;border:1px solid rgba(52,255,110,.35);background:rgba(52,255,110,.06);color:#e6ffee!important;backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.3);transition:all .22s var(--ease-out);}
+.contact-link{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.3rem;border-radius:8px;border:1px solid rgba(52,255,110,.35);background:rgba(52,255,110,.09);color:#e6ffee!important;box-shadow:0 4px 16px rgba(0,0,0,.3);transition:all .22s var(--ease-out);}
 .contact-link:hover{border-color:var(--green);color:var(--green)!important;background:rgba(52,255,110,.16);box-shadow:0 0 20px rgba(52,255,110,.35);transform:translateY(-2px)}
 footer{position:relative;z-index:4;padding:var(--s8) var(--s6);border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s4);max-width:1200px;margin-inline:auto;}
 footer p{font-family:var(--font-mono);font-size:.67rem;letter-spacing:.1em;color:var(--faint)}
 footer p span{color:var(--green)}
-.back-to-top{position:fixed;bottom:2rem;right:2rem;z-index:99;display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.65rem .95rem;border-radius:99px;background:rgba(3,15,7,.85);border:1px solid rgba(52,255,110,.45);color:var(--green);box-shadow:0 8px 32px rgba(0,0,0,.7),0 0 20px rgba(52,255,110,.2);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),visibility .3s,background .2s,box-shadow .2s;}
+.back-to-top{position:fixed;bottom:2rem;right:2rem;z-index:99;display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.1em;padding:.65rem .95rem;border-radius:99px;background:rgba(3,15,7,.92);border:1px solid rgba(52,255,110,.45);color:var(--green);box-shadow:0 8px 32px rgba(0,0,0,.7),0 0 20px rgba(52,255,110,.2);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(16px);transition:opacity .3s var(--ease-out),transform .3s var(--ease-out),visibility .3s,background .2s,box-shadow .2s;}
 .back-to-top.is-visible{opacity:1;visibility:visible;transform:translateY(0);}
 .back-to-top:hover{background:rgba(52,255,110,.2);border-color:var(--green);box-shadow:0 0 30px rgba(52,255,110,.45),0 8px 24px rgba(0,0,0,.8);transform:translateY(-3px);}
 .back-to-top svg{transition:transform .2s var(--ease-out);}
@@ -915,7 +1032,7 @@ footer p span{color:var(--green)}
   .nav-logo{gap:.5rem;font-size:.7rem;letter-spacing:.14em}
   .nav-yantra-icon{width:20px;height:20px}
   .nav-toggle{display:flex}
-  .nav-links{position:absolute;top:100%;left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:.5rem .75rem calc(.75rem + env(safe-area-inset-bottom));background:rgba(2,9,4,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border);box-shadow:0 24px 48px rgba(0,0,0,.65);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px);transition:opacity .22s var(--ease-out),transform .22s var(--ease-out),visibility .22s;}
+  .nav-links{position:absolute;top:100%;left:0;right:0;display:flex;flex-direction:column;align-items:stretch;gap:0;padding:.5rem .75rem calc(.75rem + env(safe-area-inset-bottom));background:rgba(2,9,4,.97);border-bottom:1px solid var(--border);box-shadow:0 24px 48px rgba(0,0,0,.65);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px);transition:opacity .22s var(--ease-out),transform .22s var(--ease-out),visibility .22s;}
   .nav-links.is-open{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0)}
   .nav-links a{display:flex;align-items:center;min-height:46px;padding:.8rem .75rem;border-radius:8px;font-size:.78rem;letter-spacing:.14em;color:var(--text);}
   .nav-links a::after{display:none}
