@@ -39,28 +39,17 @@
       </article>
     </div>
 
-    <div ref="ghSentinel" class="gh-sentinel" aria-hidden="true"></div>
-    <GitHubActivity v-if="ghReady" :activity="githubActivity" />
+    <GitHubActivity :activity="githubActivity" />
   </section>
 </template>
 
 <script setup>
-import { defineAsyncComponent, ref } from 'vue';
+import GitHubActivity from '@/components/GitHubActivity.vue';
 import ProjectVideo from '@/components/ProjectVideo.vue';
-import { useLazySection } from '@/composables/useLazySection';
-
-// Loaded on demand: keeps the 77KB contribution dataset out of the initial
-// bundle so it cannot delay first paint.
-const GitHubActivity = defineAsyncComponent(() => import('@/components/GitHubActivity.vue'));
 
 defineProps({
   section: { type: Object, required: true },
   projects: { type: Array, required: true },
   githubActivity: { type: Object, required: true }
 });
-
-const ghSentinel = ref(null);
-// Mount eagerly after first paint (~150ms idle) or immediately when scrolled near,
-// eliminating mid-scroll chunk loads and layout shifts.
-const ghReady = useLazySection(ghSentinel, { rootMargin: '1600px 0px', eagerDelayMs: 150 });
 </script>

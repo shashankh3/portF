@@ -1,7 +1,7 @@
 /* Design tokens, resets, backdrop layers, navigation and hero shell. */
 :root {
   --bg: #000;
-  --surface: rgba(6,18,10,0.72);
+  --surface: rgba(6,18,10,0.84);
   --border: rgba(52,255,110,0.14);
   --border-hover: rgba(52,255,110,0.38);
   --text: #e6ffee;
@@ -13,8 +13,8 @@
   --font-mono: 'Space Mono', 'SFMono-Regular', Consolas, monospace;
   --font-body: 'Inter', -apple-system, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --shadow: 0 8px 40px rgba(0,0,0,0.6), 0 1px 0 rgba(52,255,110,0.06);
-  --shadow-hover: 0 16px 60px rgba(0,0,0,0.7), 0 1px 0 rgba(52,255,110,0.12);
+  --shadow: 0 8px 24px rgba(0,0,0,0.45), 0 1px 0 rgba(52,255,110,0.06);
+  --shadow-hover: 0 12px 32px rgba(0,0,0,0.55), 0 1px 0 rgba(52,255,110,0.12);
   --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;
   --s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;
 }
@@ -44,13 +44,10 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
    instead of repainting a full-viewport gradient on every mouse move. */
 .spotlight{position:fixed;top:0;left:0;width:920px;height:920px;z-index:2;pointer-events:none;will-change:transform;transform:translate3d(calc(var(--mx,50vw) - 460px),calc(var(--my,30vh) - 460px),0);background:radial-gradient(circle 460px at 50% 50%,rgba(52,255,110,.075),rgba(52,255,110,.02) 45%,transparent 68%);}
 .scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;contain:strict;transform:translateZ(0);background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.13) 3px 4px);opacity:.55;}
-.scanlines::after{content:'';position:absolute;left:0;right:0;height:200px;will-change:transform;background:linear-gradient(to bottom,transparent,rgba(52,255,110,.035),transparent);animation:scan-sweep 11s linear infinite}
-@keyframes scan-sweep{from{transform:translateY(-200px)}to{transform:translateY(100vh)}}
-@media(prefers-reduced-motion:reduce){.scanlines::after{display:none}}
 .shell{position:relative;z-index:4;width:min(1200px,calc(100% - var(--s8)));margin-inline:auto}
-nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(0,0,0,.48);border-bottom:1px solid rgba(52,255,110,.1);transform:translateZ(0);}
+nav{position:sticky;top:0;z-index:10;background:rgba(2,9,4,.88);border-bottom:1px solid rgba(52,255,110,.12);transform:translateZ(0);}
 body.nav-open{overflow:hidden}
-.nav-overlay{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s var(--ease-out),visibility .25s;}
+.nav-overlay{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.72);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .22s var(--ease-out),visibility .22s;}
 .nav-overlay.is-open{opacity:1;visibility:visible;pointer-events:auto}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s6);max-width:1200px;margin-inline:auto;}
 .scroll-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;transform-origin:0 50%;transform:scaleX(0);will-change:transform;background:linear-gradient(90deg,var(--green-mid),var(--green));box-shadow:0 0 12px rgba(52,255,110,.7);}

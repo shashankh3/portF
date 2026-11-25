@@ -40,8 +40,7 @@ import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import AppIcon from '@/components/AppIcon.vue';
 import { prefersReducedMotion } from '@/utils/media';
 
-const PLAY_SETTLE_MS = 80;
-const IDLE_PRELOAD_TIMEOUT_MS = 1200;
+const PLAY_SETTLE_MS = 200;
 
 const props = defineProps({
   id: { type: String, required: true },
@@ -63,25 +62,13 @@ let unmounted = false;
 let observer = null;
 let lazyObserver = null;
 let visibilityHandler = null;
+let scrollHandler = null;
 let playTimer = null;
-let idleHandle = null;
-let idleTimer = null;
 
 function clearPlayTimer() {
   if (playTimer) {
     clearTimeout(playTimer);
     playTimer = null;
-  }
-}
-
-function clearIdleWarmup() {
-  if (idleHandle !== null && typeof window !== 'undefined' && typeof window.cancelIdleCallback === 'function') {
-    window.cancelIdleCallback(idleHandle);
-    idleHandle = null;
-  }
-  if (idleTimer) {
-    clearTimeout(idleTimer);
-    idleTimer = null;
   }
 }
 
@@ -99,7 +86,7 @@ function play() {
 function scheduleAutoplay() {
   clearPlayTimer();
   if (!visible || userPaused || reduceMotion) return;
-  // Wait briefly for fast scrolling to settle before starting hardware decode.
+  // Wait for active scrolling to stop so video decoding never competes with scroll frames.
   playTimer = setTimeout(() => {
     playTimer = null;
     if (visible && !userPaused && !reduceMotion) play();
@@ -108,8 +95,7 @@ function scheduleAutoplay() {
 
 function load({ autoplay = false } = {}) {
   if (videoSrc.value) return;
-  clearIdleWarmup();
-  // null -> the src attribute is absent until initial render completes.
+  // null -> the src attribute is absent until the card approaches the viewport.
   videoSrc.value = props.src;
   if (!autoplay && (!visible || userPaused || reduceMotion)) return;
 
@@ -148,6 +134,14 @@ onMounted(() => {
   video.muted = true;
   reduceMotion = prefersReducedMotion();
 
+  // Pause active video decode while scrolling so GPU media work never drops scroll frames.
+  scrollHandler = () => {
+    if (!visible) return;
+    if (!video.paused) video.pause();
+    scheduleAutoplay();
+  };
+  window.addEventListener('scroll', scrollHandler, { passive: true });
+
   // A backgrounded tab should not keep decoding frames.
   visibilityHandler = () => {
     if (typeof document === 'undefined') return;
@@ -168,8 +162,7 @@ onMounted(() => {
     return;
   }
 
-  // Pull metadata ahead of the viewport or once the browser goes idle after
-  // initial paint, so cards never stall while scrolling.
+  // Only allocate media pipelines for videos near the viewport.
   lazyObserver = new IntersectionObserver(
     ([entry]) => {
       if (!entry.isIntersecting) return;
@@ -177,15 +170,9 @@ onMounted(() => {
       lazyObserver?.disconnect();
       lazyObserver = null;
     },
-    { rootMargin: '1000px 0px' }
+    { rootMargin: '500px 0px' }
   );
   lazyObserver.observe(video);
-
-  if (typeof window.requestIdleCallback === 'function') {
-    idleHandle = window.requestIdleCallback(() => load(), { timeout: IDLE_PRELOAD_TIMEOUT_MS });
-  } else {
-    idleTimer = setTimeout(() => load(), 300);
-  }
 
   observer = new IntersectionObserver(
     ([entry]) => {
@@ -205,7 +192,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   unmounted = true;
   clearPlayTimer();
-  clearIdleWarmup();
   if (observer) {
     observer.disconnect();
     observer = null;
@@ -213,6 +199,10 @@ onBeforeUnmount(() => {
   if (lazyObserver) {
     lazyObserver.disconnect();
     lazyObserver = null;
+  }
+  if (scrollHandler && typeof window !== 'undefined') {
+    window.removeEventListener('scroll', scrollHandler);
+    scrollHandler = null;
   }
   if (visibilityHandler && typeof document !== 'undefined') {
     document.removeEventListener('visibilitychange', visibilityHandler);
@@ -228,14 +218,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.pv{margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(52,255,110,.22);background:#050b07;box-shadow:0 18px 50px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.4),0 0 32px rgba(52,255,110,.06);transition:box-shadow .25s var(--ease-out),border-color .25s var(--ease-out);}
-.pv:hover{border-color:rgba(52,255,110,.45);box-shadow:0 22px 60px rgba(0,0,0,.7),0 0 40px rgba(52,255,110,.14)}
+.pv{margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(52,255,110,.22);background:#050b07;box-shadow:0 12px 32px rgba(0,0,0,.5);transition:border-color .2s var(--ease-out);}
+.pv:hover{border-color:rgba(52,255,110,.45)}
 .pv-bar{display:flex;align-items:center;gap:.75rem;padding:.55rem .8rem;background:rgba(255,255,255,.035);border-bottom:1px solid rgba(52,255,110,.12)}
 .pv-dots{display:flex;gap:.35rem}
 .pv-dots i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.14)}
 .pv-dots i:first-child{background:rgba(52,255,110,.55)}
 .pv-url{flex:1;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.06em;color:var(--muted);padding:.2rem .6rem;border-radius:5px;background:rgba(0,0,0,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pv-stage{position:relative;aspect-ratio:16/10;background:#000}
+.pv-stage{position:relative;aspect-ratio:16/10;background:#000;contain:layout style paint}
 .pv-stage video{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
 .pv-btn{position:absolute;right:.7rem;bottom:.7rem;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.72);border:1px solid rgba(52,255,110,.45);color:var(--green);opacity:.75;transition:opacity .2s,transform .2s var(--ease-out),background .2s}
 .pv-btn :deep(svg){display:block}

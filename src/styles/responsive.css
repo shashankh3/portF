@@ -79,7 +79,6 @@
   .back-to-top{display:inline-flex;min-height:40px;bottom:calc(1rem + env(safe-area-inset-bottom));right:1rem;padding:.55rem .8rem;font-size:.6rem}
 }
 @media(hover:none){
-  .glass:hover{transform:none}
   .btn:hover,.contact-link:hover{transform:none}
   .back-to-top:hover{transform:translateY(0)}
 }

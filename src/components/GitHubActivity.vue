@@ -466,8 +466,7 @@ onBeforeUnmount(() => {
 /* Exact GitHub Dark Theme Green Color Steps */
 .level-0 {
   background-color: #161b22;
-  outline: 1px solid rgba(255, 255, 255, 0.05);
-  outline-offset: -1px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .level-1 {
   background-color: #0e4429;
@@ -480,7 +479,6 @@ onBeforeUnmount(() => {
 }
 .level-4 {
   background-color: #39d353;
-  box-shadow: 0 0 5px rgba(57, 211, 83, 0.4);
 }
 
 /* Footer & Legend */

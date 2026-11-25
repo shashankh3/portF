@@ -2,9 +2,23 @@ import { onBeforeUnmount, onMounted } from 'vue';
 
 const STAGGER_MS = 25;
 const MAX_STAGGER_STEPS = 2;
+const IDLE_REVEAL_TIMEOUT_MS = 400;
 
 export function useReveal(rootRef) {
   let observer = null;
+  let idleHandle = null;
+  let idleTimer = null;
+
+  const clearIdle = () => {
+    if (idleHandle !== null && typeof window !== 'undefined' && typeof window.cancelIdleCallback === 'function') {
+      window.cancelIdleCallback(idleHandle);
+      idleHandle = null;
+    }
+    if (idleTimer) {
+      clearTimeout(idleTimer);
+      idleTimer = null;
+    }
+  };
 
   onMounted(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
@@ -41,15 +55,32 @@ export function useReveal(rootRef) {
           observer?.unobserve(entry.target);
         });
       },
-      // Pre-reveal slightly ahead of the viewport so content is already visible
-      // and composited before the user's eye reaches it during fast scrolling.
       { threshold: 0, rootMargin: '180px 0px 180px 0px' }
     );
 
     items.forEach((el) => observer.observe(el));
+
+    // Pre-reveal remaining off-screen sections once the browser is idle after
+    // initial paint, so scrolling down never triggers mid-scroll GPU tile raster flushes.
+    const revealAll = () => {
+      for (const el of items) {
+        el.classList.add('is-visible');
+      }
+      if (observer) {
+        observer.disconnect();
+        observer = null;
+      }
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      idleHandle = window.requestIdleCallback(revealAll, { timeout: IDLE_REVEAL_TIMEOUT_MS });
+    } else {
+      idleTimer = setTimeout(revealAll, IDLE_REVEAL_TIMEOUT_MS);
+    }
   });
 
   onBeforeUnmount(() => {
+    clearIdle();
     if (observer) {
       observer.disconnect();
       observer = null;

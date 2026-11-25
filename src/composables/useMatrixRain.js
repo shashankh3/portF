@@ -194,7 +194,7 @@ export function useMatrixRain(canvasRef) {
     if (typeof window === 'undefined') return;
     const canvas = canvasRef.value;
     if (!canvas) return;
-    ctx = canvas.getContext('2d');
+    ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
     motionQuery = getMediaQueryList('(prefers-reduced-motion: reduce)');
