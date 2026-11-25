@@ -27,7 +27,7 @@ html.reveal-ready [data-reveal].is-visible{opacity:1}
 .signal-card li::before{content:'//';font-family:var(--font-mono);font-size:.7rem;color:var(--green);font-weight:700;white-space:nowrap}
 .project-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s5)}
 .project-card{padding:var(--s8)}
-.project-card.span-2,.project-card.has-video{grid-column:1/-1}
+.project-card.has-video{grid-column:1/-1}
 .project-card.has-video{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:var(--s8);align-items:center}
 .proj-num{font-family:var(--font-mono);font-size:.65rem;letter-spacing:.2em;color:var(--faint);margin-bottom:var(--s4)}
 .proj-title{font-size:1.4rem;font-weight:600;letter-spacing:-.02em;color:#e8fff2;margin-bottom:var(--s2)}

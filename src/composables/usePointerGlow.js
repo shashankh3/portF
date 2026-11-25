@@ -1,4 +1,5 @@
 import { onBeforeUnmount, onMounted } from 'vue';
+import { canHoverPointer, prefersReducedMotion } from '@/utils/media';
 
 // Pointer-tracking glow for the background spotlight and card sheen.
 // Only runs on devices with a real hovering pointer; touch devices get a
@@ -25,8 +26,8 @@ export function usePointerGlow(spotlightRef) {
       }
 
       if (!hoveredCard) return;
-      // Re-measure only after scrolling; pointer movement alone never forces
-      // a layout read.
+      // Re-measure only after scrolling or resizing; pointer movement alone
+      // never forces a layout read.
       if (!hoveredRect || rectDirty) {
         hoveredRect = hoveredCard.getBoundingClientRect();
         rectDirty = false;
@@ -45,31 +46,34 @@ export function usePointerGlow(spotlightRef) {
     rectDirty = false;
   };
 
-  const onScroll = () => {
+  const markRectDirty = () => {
     if (hoveredCard) rectDirty = true;
   };
 
   onMounted(() => {
-    // Guarded so the composable is safe to call outside a browser (SSR/tests).
-    const canHover =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const reduceMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    enabled = canHover && !reduceMotion;
+    if (typeof window === 'undefined') return;
+    enabled = canHoverPointer() && !prefersReducedMotion();
     if (!enabled) return;
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerover', onPointerOver, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', markRectDirty, { passive: true });
+    window.addEventListener('resize', markRectDirty, { passive: true });
   });
 
   onBeforeUnmount(() => {
     if (!enabled) return;
-    window.removeEventListener('pointermove', onPointerMove);
-    window.removeEventListener('pointerover', onPointerOver);
-    window.removeEventListener('scroll', onScroll);
-    if (frame) cancelAnimationFrame(frame);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerover', onPointerOver);
+      window.removeEventListener('scroll', markRectDirty);
+      window.removeEventListener('resize', markRectDirty);
+    }
+    if (frame) {
+      cancelAnimationFrame(frame);
+      frame = null;
+    }
+    hoveredCard = null;
+    hoveredRect = null;
   });
 }

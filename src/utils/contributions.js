@@ -3,15 +3,36 @@
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const YEAR_PATTERN = /^\d{4}$/;
+
+function toFiniteNumber(value) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : NaN;
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }
+  return NaN;
+}
 
 function isValidDate(value) {
-  if (!DATE_PATTERN.test(value)) return false;
+  if (typeof value !== 'string' || !DATE_PATTERN.test(value)) return false;
   const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
+function isValidYearNumber(year) {
+  return Number.isInteger(year) && year >= 1970 && year <= 9999;
+}
+
+function formatUtcIsoDate(date) {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(date.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function normalizeLevel(level) {
-  const value = Number(level);
+  const value = toFiniteNumber(level);
   if (!Number.isFinite(value)) return 0;
   return Math.min(4, Math.max(0, Math.round(value)));
 }
@@ -19,66 +40,99 @@ export function normalizeLevel(level) {
 // The live endpoint is third-party data: validate and normalise it before it
 // reaches class bindings or layout code.
 export function sanitizePayload(payload) {
-  if (!payload || !Array.isArray(payload.contributions)) return null;
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.contributions)) {
+    return null;
+  }
 
   const contributions = [];
   for (const entry of payload.contributions) {
-    if (!entry || typeof entry.date !== 'string' || !isValidDate(entry.date)) continue;
-    const count = Number(entry.count);
+    if (!entry || !isValidDate(entry.date)) continue;
+    const count = toFiniteNumber(entry.count);
     if (!Number.isFinite(count) || count < 0) continue;
     contributions.push({ date: entry.date, count, level: normalizeLevel(entry.level) });
   }
 
   if (!contributions.length) return null;
-  const total = payload.total && typeof payload.total === 'object' ? payload.total : {};
+
+  const total = {};
+  if (payload.total && typeof payload.total === 'object' && !Array.isArray(payload.total)) {
+    for (const [key, value] of Object.entries(payload.total)) {
+      if (!YEAR_PATTERN.test(key)) continue;
+      const numericTotal = toFiniteNumber(value);
+      if (Number.isFinite(numericTotal) && numericTotal >= 0) {
+        total[key] = numericTotal;
+      }
+    }
+  }
+
   return { contributions, total };
 }
 
 export function collectYears(payload) {
-  const years = new Set(Object.keys((payload && payload.total) || {}));
-  const contributions = (payload && payload.contributions) || [];
-  for (const entry of contributions) {
-    if (entry && typeof entry.date === 'string') years.add(entry.date.slice(0, 4));
+  const years = new Set();
+  if (payload?.total && typeof payload.total === 'object' && !Array.isArray(payload.total)) {
+    for (const key of Object.keys(payload.total)) {
+      if (YEAR_PATTERN.test(key)) years.add(key);
+    }
   }
+
+  const contributions = Array.isArray(payload?.contributions) ? payload.contributions : [];
+  for (const entry of contributions) {
+    if (entry && typeof entry.date === 'string') {
+      const year = entry.date.slice(0, 4);
+      if (YEAR_PATTERN.test(year)) years.add(year);
+    }
+  }
+
   return Array.from(years).sort((a, b) => Number(b) - Number(a));
 }
 
 export function contributionsForYear(contributions, year) {
-  const prefix = `${year}-`;
-  return (contributions || []).filter((entry) => entry.date.startsWith(prefix));
+  const yearStr = String(year ?? '');
+  if (!YEAR_PATTERN.test(yearStr) || !Array.isArray(contributions)) return [];
+  const prefix = `${yearStr}-`;
+  return contributions.filter((entry) => typeof entry?.date === 'string' && entry.date.startsWith(prefix));
 }
 
 export function totalForYear(totals, year, days) {
-  const recorded = Number(totals && totals[year]);
-  if (Number.isFinite(recorded)) return recorded;
-  return days.reduce((sum, day) => sum + day.count, 0);
+  const recorded = toFiniteNumber(totals?.[year]);
+  if (Number.isFinite(recorded) && recorded >= 0) return recorded;
+  if (!Array.isArray(days)) return 0;
+  return days.reduce((sum, day) => {
+    const count = toFiniteNumber(day?.count);
+    return sum + (Number.isFinite(count) && count > 0 ? count : 0);
+  }, 0);
 }
 
 // Builds 53-ish week columns, Sunday first, with nulls for padding.
 export function buildWeeks(year, contributions) {
-  const start = new Date(year, 0, 1);
-  const end = new Date(year, 11, 31);
+  const yearNum = Number(year);
+  if (!isValidYearNumber(yearNum)) return [];
 
-  const byDate = {};
-  for (const entry of contributions) byDate[entry.date] = entry;
+  const start = new Date(Date.UTC(yearNum, 0, 1));
+  const end = new Date(Date.UTC(yearNum, 11, 31));
+
+  const byDate = new Map();
+  if (Array.isArray(contributions)) {
+    for (const entry of contributions) {
+      if (entry && typeof entry.date === 'string') {
+        byDate.set(entry.date, entry);
+      }
+    }
+  }
 
   const weeks = [];
-  let week = [];
-  for (let i = 0; i < start.getDay(); i++) week.push(null);
+  let week = new Array(start.getUTCDay()).fill(null);
 
   const cursor = new Date(start);
   while (cursor <= end) {
-    const y = cursor.getFullYear();
-    const m = String(cursor.getMonth() + 1).padStart(2, '0');
-    const d = String(cursor.getDate()).padStart(2, '0');
-    const date = `${y}-${m}-${d}`;
-
-    week.push(byDate[date] || { date, count: 0, level: 0 });
+    const date = formatUtcIsoDate(cursor);
+    week.push(byDate.get(date) || { date, count: 0, level: 0 });
     if (week.length === 7) {
       weeks.push(week);
       week = [];
     }
-    cursor.setDate(cursor.getDate() + 1);
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
   if (week.length) {
@@ -90,30 +144,30 @@ export function buildWeeks(year, contributions) {
 }
 
 export function buildMonthHeaders(year, weeks) {
+  const yearNum = Number(year);
+  if (!isValidYearNumber(yearNum) || !Array.isArray(weeks) || !weeks.length) return [];
+
   const headers = [];
   MONTHS.forEach((name, monthIndex) => {
-    const target = new Date(year, monthIndex, 1);
-    const date = [
-      target.getFullYear(),
-      String(target.getMonth() + 1).padStart(2, '0'),
-      String(target.getDate()).padStart(2, '0')
-    ].join('-');
-
-    const column = weeks.findIndex((week) => week.some((day) => day && day.date === date));
+    const firstOfMonth = `${yearNum}-${String(monthIndex + 1).padStart(2, '0')}-01`;
+    const column = weeks.findIndex((week) => week.some((day) => day && day.date === firstOfMonth));
     if (column !== -1) headers.push({ name, col: column });
   });
   return headers;
 }
 
 export function formatDayLabel(day) {
+  if (!day || !isValidDate(day.date)) return '';
+
   const [year, month, date] = day.date.split('-').map(Number);
-  const formatted = new Date(year, month - 1, date).toLocaleDateString('en-US', {
+  const formatted = new Date(Date.UTC(year, month - 1, date)).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
+    timeZone: 'UTC'
   });
 
-  const count = day.count || 0;
+  const count = Math.max(0, toFiniteNumber(day.count) || 0);
   const summary =
     count === 0 ? 'No contributions' : count === 1 ? '1 contribution' : `${count} contributions`;
   return `${summary} on ${formatted}`;

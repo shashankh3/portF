@@ -1,11 +1,9 @@
 <template>
-  <div class="glass github-activity-card">
+  <div ref="cardRef" class="glass github-activity-card">
     <!-- Header with GitHub Icon, Total Count & Year Selector -->
     <div class="gh-top-bar">
       <div class="gh-top-left">
-        <svg class="gh-logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-          <path d="M12 2C6.477 2 2 6.477 2 12c0 4.419 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.478-10-10-10z"/>
-        </svg>
+        <AppIcon name="github" :size="22" class="gh-logo-icon" />
         <div>
           <div class="gh-headline-row">
             <span class="gh-count">{{ totalContributions }}</span>
@@ -13,12 +11,12 @@
           </div>
           <div class="gh-user-handle">
             <span class="gh-status-dot" aria-hidden="true"></span>
-            <span>github.com/shashankh3</span>
+            <span>{{ activity.handle }}</span>
           </div>
         </div>
       </div>
 
-      <!-- Year Selector Tabs (2026, 2025, 2024...) -->
+      <!-- Year Selector Tabs -->
       <div class="gh-year-tabs">
         <button
           v-for="year in availableYears"
@@ -35,26 +33,26 @@
       </div>
     </div>
 
-    <!-- GitHub Exact Calendar Box Container -->
+    <!-- GitHub Calendar Grid -->
     <div class="gh-calendar-box">
-      <div class="gh-calendar-scroll" aria-hidden="true">
+      <div class="gh-calendar-scroll" aria-hidden="true" @scroll="hideTooltip">
         <div class="gh-grid-wrapper">
           <!-- Month Labels Header -->
           <div class="gh-months-row">
             <div class="gh-weekday-spacer"></div>
             <div class="gh-month-labels">
               <span
-                v-for="m in monthHeaders"
-                :key="m.name + m.col"
+                v-for="month in monthHeaders"
+                :key="month.name + month.col"
                 class="gh-month-label"
-                :style="{ left: `${m.col * 14}px` }"
+                :style="{ left: `${month.col * 14}px` }"
               >
-                {{ m.name }}
+                {{ month.name }}
               </span>
             </div>
           </div>
 
-          <!-- Main Calendar Grid: Left Day Labels + 53 Week Columns -->
+          <!-- Main Calendar Grid: Left Day Labels + Week Columns -->
           <div class="gh-days-and-grid">
             <div class="gh-weekday-labels">
               <span></span>
@@ -86,9 +84,14 @@
         </div>
       </div>
 
-      <!-- Footer Bar: Link + Exact GitHub Legend -->
+      <!-- Footer Bar: Link + GitHub Legend -->
       <div class="gh-calendar-footer">
-        <a href="https://github.com/shashankh3" target="_blank" rel="noreferrer" class="gh-learn-link">
+        <a
+          :href="activity.profileUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="gh-learn-link"
+        >
           View full profile on GitHub ↗
         </a>
         <div class="gh-legend" aria-hidden="true">
@@ -115,7 +118,7 @@
       </div>
       <div class="gh-tele-item">
         <span class="gh-tele-label">PRIMARY LANGUAGE</span>
-        <span class="gh-tele-val">TypeScript · Python · Vue/React</span>
+        <span class="gh-tele-val">{{ activity.primaryLanguage }}</span>
       </div>
     </div>
 
@@ -131,8 +134,10 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import defaultPayload from '@/assets/github-contributions.json';
+import AppIcon from '@/components/AppIcon.vue';
 import {
   buildMonthHeaders,
   buildWeeks,
@@ -143,118 +148,125 @@ import {
   totalForYear
 } from '@/utils/contributions';
 
-const LIVE_ENDPOINT = 'https://github-contributions-api.jogruber.de/v4/shashankh3';
 const FETCH_TIMEOUT_MS = 8000;
+const TOOLTIP_EDGE_PADDING_PX = 108;
 
 const bundledData = sanitizePayload(defaultPayload) || { contributions: [], total: {} };
 const bundledYears = collectYears(bundledData);
 
-export default {
-  name: 'GitHubActivity',
-  data() {
-    return {
-      // Bundled snapshot renders instantly; the live fetch only replaces it
-      // when it succeeds and passes validation.
-      contributionsData: bundledData,
-      selectedYear: bundledYears[0] || String(new Date().getFullYear()),
-      tooltip: {
-        visible: false,
-        text: '',
-        x: 0,
-        y: 0
-      }
-    };
-  },
-  computed: {
-    availableYears() {
-      return collectYears(this.contributionsData);
-    },
-    yearContributions() {
-      return contributionsForYear(this.contributionsData.contributions, this.selectedYear);
-    },
-    totalContributions() {
-      return totalForYear(this.contributionsData.total, this.selectedYear, this.yearContributions);
-    },
-    maxDayCount() {
-      if (!this.yearContributions.length) return 0;
-      return Math.max(...this.yearContributions.map((day) => day.count || 0));
-    },
-    activeDaysCount() {
-      return this.yearContributions.filter((day) => (day.count || 0) > 0).length;
-    },
-    weeksData() {
-      return buildWeeks(Number(this.selectedYear), this.yearContributions);
-    },
-    monthHeaders() {
-      return buildMonthHeaders(Number(this.selectedYear), this.weeksData);
+const props = defineProps({
+  activity: { type: Object, required: true }
+});
+
+const cardRef = ref(null);
+// Bundled snapshot renders instantly; the live fetch only replaces it
+// when it succeeds and passes validation.
+const contributionsData = ref(bundledData);
+const selectedYear = ref(bundledYears[0] || String(new Date().getFullYear()));
+const tooltip = ref({
+  visible: false,
+  text: '',
+  x: 0,
+  y: 0
+});
+
+let abortController = null;
+
+const availableYears = computed(() => collectYears(contributionsData.value));
+const yearContributions = computed(() =>
+  contributionsForYear(contributionsData.value.contributions, selectedYear.value)
+);
+const totalContributions = computed(() =>
+  totalForYear(contributionsData.value.total, selectedYear.value, yearContributions.value)
+);
+const maxDayCount = computed(() =>
+  yearContributions.value.reduce((max, day) => Math.max(max, day.count || 0), 0)
+);
+const activeDaysCount = computed(
+  () => yearContributions.value.filter((day) => (day.count || 0) > 0).length
+);
+const weeksData = computed(() =>
+  buildWeeks(Number(selectedYear.value), yearContributions.value)
+);
+const monthHeaders = computed(() =>
+  buildMonthHeaders(Number(selectedYear.value), weeksData.value)
+);
+
+function selectYear(year) {
+  selectedYear.value = year;
+  tooltip.value.visible = false;
+}
+
+async function fetchLiveContributions() {
+  if (typeof fetch !== 'function' || typeof AbortController === 'undefined') return;
+
+  const controller = new AbortController();
+  abortController = controller;
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(props.activity.endpoint, {
+      signal: controller.signal,
+      headers: { Accept: 'application/json' }
+    });
+    if (!response.ok) return;
+
+    const payload = sanitizePayload(await response.json());
+    if (!payload) return;
+
+    contributionsData.value = payload;
+    const years = collectYears(payload);
+    if (!years.includes(selectedYear.value)) {
+      selectedYear.value = years[0] || selectedYear.value;
     }
-  },
-  mounted() {
-    this.fetchLiveContributions();
-  },
-  beforeUnmount() {
-    if (this.abortController) this.abortController.abort();
-  },
-  methods: {
-    selectYear(year) {
-      this.selectedYear = year;
-      this.tooltip.visible = false;
-    },
-    async fetchLiveContributions() {
-      const controller = new AbortController();
-      this.abortController = controller;
-      const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-      try {
-        const response = await fetch(LIVE_ENDPOINT, {
-          signal: controller.signal,
-          headers: { Accept: 'application/json' }
-        });
-        if (!response.ok) return;
-
-        const payload = sanitizePayload(await response.json());
-        if (!payload) return;
-
-        this.contributionsData = payload;
-        const years = collectYears(payload);
-        if (!years.includes(this.selectedYear)) {
-          this.selectedYear = years[0] || this.selectedYear;
-        }
-      } catch {
-        // Offline, blocked or timed out: keep the bundled snapshot.
-      } finally {
-        clearTimeout(timeout);
-        if (this.abortController === controller) this.abortController = null;
-      }
-    },
-    showTooltip(event, day) {
-      const rect = event.target.getBoundingClientRect();
-      const parentRect = this.$el.getBoundingClientRect();
-
-      this.tooltip = {
-        visible: true,
-        text: formatDayLabel(day),
-        x: rect.left - parentRect.left + rect.width / 2,
-        y: rect.top - parentRect.top - 32
-      };
-    },
-    hideTooltip() {
-      this.tooltip.visible = false;
-    }
+  } catch {
+    // Offline, blocked or timed out: keep the bundled snapshot.
+  } finally {
+    clearTimeout(timeout);
+    if (abortController === controller) abortController = null;
   }
-};
-</script>
+}
 
+function showTooltip(event, day) {
+  const card = cardRef.value;
+  if (!card || !event.target) return;
+
+  const rect = event.target.getBoundingClientRect();
+  const parentRect = card.getBoundingClientRect();
+  const rawX = rect.left - parentRect.left + rect.width / 2;
+  const clampedX =
+    parentRect.width > TOOLTIP_EDGE_PADDING_PX * 2
+      ? Math.min(parentRect.width - TOOLTIP_EDGE_PADDING_PX, Math.max(TOOLTIP_EDGE_PADDING_PX, rawX))
+      : rawX;
+
+  tooltip.value = {
+    visible: true,
+    text: formatDayLabel(day),
+    x: clampedX,
+    y: rect.top - parentRect.top - 32
+  };
+}
+
+function hideTooltip() {
+  tooltip.value.visible = false;
+}
+
+onMounted(() => {
+  fetchLiveContributions();
+});
+
+onBeforeUnmount(() => {
+  if (abortController) {
+    abortController.abort();
+    abortController = null;
+  }
+});
+</script>
 
 <style scoped>
 .github-activity-card {
   padding: var(--s8);
   margin-top: var(--s10);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  position: relative;
-  box-shadow: var(--shadow);
 }
 
 /* Top bar with icon, count, and year tabs */

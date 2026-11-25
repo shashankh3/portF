@@ -18,19 +18,19 @@ npm install       # install dependencies
 npm run serve     # dev server with hot reload
 npm run build     # production bundle in dist/
 npm run lint      # ESLint (JS + Vue SFCs)
-npm test          # Vitest unit tests for pure helpers
+npm test          # Vitest unit tests
 ```
 
 ## Structure
 
 ```
 src/
-  App.vue                 page template and composition root
-  components/             video player, GitHub activity calendar
-  composables/            rain, typing, scroll spy, reveal, pointer, menu
-  data/portfolio.js       all page copy and project metadata
+  App.vue                 page composition root
+  components/             section components, AppIcon, ProjectVideo, GitHubActivity
+  composables/            rain, typing, scroll spy, reveal, pointer, menu, lazy section
+  data/portfolio.js       all page copy, profile links and project metadata
   styles/                 base tokens, sections, responsive breakpoints
-  utils/                  asset-path and contribution-calendar helpers
+  utils/                  asset-path, media-query and contribution-calendar helpers
 public/                   static files (videos, posters, resume, favicon)
 ```
 
@@ -41,7 +41,7 @@ constants (speed, cell size, trail fade, colours) are intentionally fixed.
 ## Deployment
 
 Pushes to `main` deploy to GitHub Pages via
-`.github/workflows/pages.yml`. The workflow runs lint, builds with
+`.github/workflows/pages.yml`. The workflow runs lint and tests, builds with
 `PUBLIC_PATH=/<repo>/`, and publishes `dist/`.
 
 `vue.config.js` reads `PUBLIC_PATH` so the same build works from a domain

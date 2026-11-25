@@ -1,38 +1,58 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { prefersReducedMotion } from '@/utils/media';
 
 const ACTIVE_LINE_OFFSET = 160;
+const BOTTOM_THRESHOLD_PX = 6;
+const BACK_TO_TOP_THRESHOLD_PX = 400;
 
-export function useScrollSpy({ sectionIds, progressRef }) {
+export function resolveScrollState({ scrollY, maxScroll, sectionIds, sectionOffsets }) {
+  const showBackToTop = scrollY > BACK_TO_TOP_THRESHOLD_PX;
+  const progress = maxScroll > 0 ? Math.min(1, Math.max(0, scrollY / maxScroll)) : 0;
+
+  let activeSection = '';
+  for (let i = 0; i < sectionOffsets.length; i++) {
+    if (scrollY + ACTIVE_LINE_OFFSET >= sectionOffsets[i]) {
+      activeSection = sectionIds[i];
+    }
+  }
+  if (maxScroll > 0 && scrollY >= maxScroll - BOTTOM_THRESHOLD_PX && sectionIds.length) {
+    activeSection = sectionIds[sectionIds.length - 1];
+  }
+
+  return { activeSection, showBackToTop, progress };
+}
+
+export function useScrollSpy({ sectionIds, progressRef = null }) {
   const activeSection = ref('');
   const showBackToTop = ref(false);
 
   let sectionOffsets = [];
-  let maxScroll = 1;
+  let maxScroll = 0;
   let scrollRaf = null;
   let measureRaf = null;
   let resizeObserver = null;
+  let listening = false;
 
   const update = () => {
-    const y = window.scrollY;
-    showBackToTop.value = y > 400;
+    const state = resolveScrollState({
+      scrollY: window.scrollY,
+      maxScroll,
+      sectionIds,
+      sectionOffsets
+    });
+
+    showBackToTop.value = state.showBackToTop;
 
     // Write the progress bar transform straight to the DOM. Binding it to a
     // reactive value would re-render the whole page on every scroll frame.
-    const bar = progressRef.value;
+    const bar = progressRef?.value;
     if (bar) {
-      const progress = Math.min(1, Math.max(0, y / maxScroll));
-      bar.style.transform = `scaleX(${progress})`;
+      bar.style.transform = `scaleX(${state.progress})`;
     }
 
-    // Scroll spy against cached offsets: no layout reads while scrolling.
-    let current = '';
-    for (let i = 0; i < sectionOffsets.length; i++) {
-      if (y + ACTIVE_LINE_OFFSET >= sectionOffsets[i]) current = sectionIds[i];
+    if (state.activeSection !== activeSection.value) {
+      activeSection.value = state.activeSection;
     }
-    if (y >= maxScroll - 6 && sectionIds.length) {
-      current = sectionIds[sectionIds.length - 1];
-    }
-    if (current !== activeSection.value) activeSection.value = current;
   };
 
   const onScroll = () => {
@@ -54,23 +74,31 @@ export function useScrollSpy({ sectionIds, progressRef }) {
         const el = document.getElementById(id);
         return el ? el.getBoundingClientRect().top + window.scrollY : Infinity;
       });
-      maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
       // Re-evaluate the spy now that offsets are known.
       update();
     });
   };
 
   const scrollToTop = () => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (typeof window === 'undefined') return;
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   };
 
   onMounted(() => {
+    if (
+      typeof window === 'undefined' ||
+      typeof document === 'undefined' ||
+      typeof window.addEventListener !== 'function'
+    ) {
+      return;
+    }
+
     measure();
-    update();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', measure);
     window.addEventListener('orientationchange', measure);
+    listening = true;
 
     // Section offsets shift as content reveals and videos load, so re-measure
     // whenever the page height changes.
@@ -81,12 +109,24 @@ export function useScrollSpy({ sectionIds, progressRef }) {
   });
 
   onBeforeUnmount(() => {
-    window.removeEventListener('scroll', onScroll);
-    window.removeEventListener('resize', measure);
-    window.removeEventListener('orientationchange', measure);
-    if (resizeObserver) resizeObserver.disconnect();
-    if (scrollRaf) cancelAnimationFrame(scrollRaf);
-    if (measureRaf) cancelAnimationFrame(measureRaf);
+    if (listening && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('orientationchange', measure);
+      listening = false;
+    }
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+    if (scrollRaf) {
+      cancelAnimationFrame(scrollRaf);
+      scrollRaf = null;
+    }
+    if (measureRaf) {
+      cancelAnimationFrame(measureRaf);
+      measureRaf = null;
+    }
   });
 
   return { activeSection, showBackToTop, scrollToTop };

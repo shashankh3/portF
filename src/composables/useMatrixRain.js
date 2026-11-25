@@ -1,4 +1,5 @@
 import { onBeforeUnmount, onMounted } from 'vue';
+import { getMediaQueryList } from '@/utils/media';
 
 // The falling-code effect. Visual constants are intentionally fixed: this is
 // the signature look of the site, so speed, cell size and trail fade must not
@@ -6,6 +7,8 @@ import { onBeforeUnmount, onMounted } from 'vue';
 
 const CHARS = 'アァイィウェオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>{}[]/*+-=|\\:;'.split('');
 const SIZE = 15;
+const BASE_FONT = `${SIZE}px monospace`;
+const HEAD_FONT = `${SIZE + 4}px monospace`;
 const TARGET_FRAME_MS = 40; // ~25fps visual cadence
 const FADE = 'rgba(0,0,0,0.055)';
 const HEAD_BLOOM = 'rgba(52,255,110,0.18)';
@@ -50,7 +53,7 @@ export function useMatrixRain(canvasRef) {
     if (!ctx) return;
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, width, height);
-    ctx.font = `${SIZE}px monospace`;
+    ctx.font = BASE_FONT;
     for (let i = 0; i < drops.length; i++) {
       ctx.fillStyle = Math.random() > 0.75 ? COLOR_MID : COLOR_BODY;
       ctx.fillText(CHARS[Math.floor(Math.random() * CHARS.length)], i * SIZE, Math.random() * height);
@@ -89,6 +92,7 @@ export function useMatrixRain(canvasRef) {
   };
 
   const draw = () => {
+    if (!ctx) return;
     const now = performance.now();
     if (now > warmupUntil && lastTick > 0) {
       // Only sustained, severe lag counts as "this device is struggling".
@@ -106,7 +110,7 @@ export function useMatrixRain(canvasRef) {
 
     ctx.fillStyle = FADE;
     ctx.fillRect(0, 0, width, height);
-    ctx.font = `${SIZE}px monospace`;
+    ctx.font = BASE_FONT;
 
     for (let i = 0; i < drops.length; i++) {
       const x = i * SIZE;
@@ -116,10 +120,10 @@ export function useMatrixRain(canvasRef) {
 
       if (r > 0.98) {
         // Bright head glyph with a faux-bloom for the phosphor glow.
-        ctx.font = `${SIZE + 4}px monospace`;
+        ctx.font = HEAD_FONT;
         ctx.fillStyle = HEAD_BLOOM;
         ctx.fillText(glyph, x, y - 2);
-        ctx.font = `${SIZE}px monospace`;
+        ctx.font = BASE_FONT;
         ctx.fillStyle = COLOR_HEAD;
         ctx.fillText(glyph, x, y);
       } else if (r > 0.92) {
@@ -150,7 +154,7 @@ export function useMatrixRain(canvasRef) {
   };
 
   const start = () => {
-    if (running || reduceMotion) return;
+    if (running || reduceMotion || !ctx) return;
     running = true;
     const now = performance.now();
     lastFrameTime = now;
@@ -161,16 +165,17 @@ export function useMatrixRain(canvasRef) {
   const stop = () => {
     if (!running) return;
     running = false;
-    if (frame) cancelAnimationFrame(frame);
-    frame = null;
+    if (frame) {
+      cancelAnimationFrame(frame);
+      frame = null;
+    }
   };
 
   const onVisibilityChange = () => {
+    if (typeof document === 'undefined') return;
     if (document.hidden) {
       stop();
     } else {
-      lastFrameTime = performance.now();
-      lastTick = performance.now();
       start();
     }
   };
@@ -186,22 +191,22 @@ export function useMatrixRain(canvasRef) {
   };
 
   onMounted(() => {
+    if (typeof window === 'undefined') return;
     const canvas = canvasRef.value;
     if (!canvas) return;
     ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    motionQuery =
-      typeof window.matchMedia === 'function'
-        ? window.matchMedia('(prefers-reduced-motion: reduce)')
-        : null;
-    reduceMotion = motionQuery ? motionQuery.matches : false;
+    motionQuery = getMediaQueryList('(prefers-reduced-motion: reduce)');
+    reduceMotion = Boolean(motionQuery?.matches);
     scale = idealScale();
     warmupUntil = performance.now() + WARMUP_MS;
 
     resize();
     if (typeof window.addEventListener === 'function') {
       window.addEventListener('resize', resize);
+    }
+    if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
       document.addEventListener('visibilitychange', onVisibilityChange);
     }
     if (motionQuery && typeof motionQuery.addEventListener === 'function') {
@@ -215,12 +220,17 @@ export function useMatrixRain(canvasRef) {
 
   onBeforeUnmount(() => {
     stop();
-    if (typeof window.removeEventListener === 'function') {
+    if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
       window.removeEventListener('resize', resize);
+    }
+    if (typeof document !== 'undefined' && typeof document.removeEventListener === 'function') {
       document.removeEventListener('visibilitychange', onVisibilityChange);
     }
     if (motionQuery && typeof motionQuery.removeEventListener === 'function') {
       motionQuery.removeEventListener('change', onMotionPreferenceChange);
     }
+    ctx = null;
+    drops = [];
+    motionQuery = null;
   });
 }

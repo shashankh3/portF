@@ -7,6 +7,7 @@ export function useReveal(rootRef) {
   let observer = null;
 
   onMounted(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
     const root = rootRef.value;
     if (!root) return;
 
@@ -19,15 +20,16 @@ export function useReveal(rootRef) {
     }
 
     // Stagger siblings so grids cascade instead of popping in together.
-    items.forEach((el) => {
+    const siblingCounts = new WeakMap();
+    for (const el of items) {
       const parent = el.parentElement;
-      if (!parent) return;
-      const siblings = Array.from(parent.children).filter((child) => child.hasAttribute('data-reveal'));
-      const index = siblings.indexOf(el);
+      if (!parent) continue;
+      const index = siblingCounts.get(parent) ?? 0;
+      siblingCounts.set(parent, index + 1);
       if (index > 0) {
         el.style.setProperty('--reveal-delay', `${Math.min(index, MAX_STAGGER_STEPS) * STAGGER_MS}ms`);
       }
-    });
+    }
 
     document.documentElement.classList.add('reveal-ready');
 
@@ -36,7 +38,7 @@ export function useReveal(rootRef) {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          observer?.unobserve(entry.target);
         });
       },
       // Reveal as soon as any part of the element is on screen, so text is
@@ -48,7 +50,12 @@ export function useReveal(rootRef) {
   });
 
   onBeforeUnmount(() => {
-    if (observer) observer.disconnect();
-    document.documentElement.classList.remove('reveal-ready');
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('reveal-ready');
+    }
   });
 }

@@ -1,7 +1,21 @@
 import { asset } from '@/utils/asset';
 
-// All page copy lives here so the template stays declarative and content
-// edits never require touching markup or layout.
+// All page copy and profile metadata live here so templates stay declarative
+// and content edits never require touching markup or layout.
+
+export const profile = {
+  name: 'Shashank Hirwani',
+  brand: 'SH // DEV',
+  email: 'shashankh3@gmail.com',
+  emailComposeUrl: 'https://mail.google.com/mail/?view=cm&fs=1&to=shashankh3@gmail.com',
+  githubUsername: 'shashankh3',
+  githubHandle: 'github.com/shashankh3',
+  githubUrl: 'https://github.com/shashankh3',
+  linkedinHandle: 'linkedin.com/in/shashankh3',
+  linkedinUrl: 'https://www.linkedin.com/in/shashankh3',
+  faviconUrl: asset('/favicon.svg'),
+  resumeUrl: asset('/shashank_resume.pdf')
+};
 
 export const navLinks = [
   { label: 'Work', href: '#work', section: 'work' },
@@ -10,17 +24,61 @@ export const navLinks = [
   { label: 'Contact', href: '#contact', section: 'contact' },
   {
     label: 'Hire Me',
-    href: 'https://mail.google.com/mail/?view=cm&fs=1&to=shashankh3@gmail.com',
+    href: profile.emailComposeUrl,
     cta: true,
     external: true
   }
 ];
 
-export const heroMeta = [
-  { label: 'Role', value: 'Full-Stack · AI · Mobile Dev' },
-  { label: 'Focus', value: 'GenAI + ROCm/CUDA + Mobile' },
-  { label: 'Location', value: 'India' }
-];
+export const sectionIds = navLinks.filter((link) => link.section).map((link) => link.section);
+
+export const hero = {
+  status: 'System Online — Available for opportunities',
+  srHeadline: 'I build AI platforms, 3D digital twins, GPU pipelines, mobile apps, and production APIs.',
+  prefix: 'I build',
+  phrases: [' AI platforms', ' 3D digital twins', ' GPU pipelines', ' mobile apps', ' production APIs'],
+  summary: [
+    { text: 'Full-Stack, GenAI & Mobile Engineer specialising in ' },
+    { text: 'hardware-accelerated AI pipelines, 3D digital twins, and offline-first mobile systems', strong: true },
+    { text: '. Skilled in ' },
+    {
+      text: 'TypeScript · Python · React Native / Expo · Vue 3 · Three.js · Django · Fireworks AI · AMD ROCm / CUDA',
+      strong: true
+    },
+    {
+      text: ', shipping production platforms with Mixture-of-Agents AI, deterministic GPU AST auditing, and Moodle REST APIs.'
+    }
+  ],
+  meta: [
+    { label: 'Role', value: 'Full-Stack · AI · Mobile Dev' },
+    { label: 'Focus', value: 'GenAI + ROCm/CUDA + Mobile' },
+    { label: 'Location', value: 'India' }
+  ]
+};
+
+export const about = {
+  index: '01',
+  tag: 'Profile',
+  title: 'Engineering high-throughput systems across AI, cloud, and edge.',
+  paragraphs: [
+    'Full-Stack, AI & Android Developer with hands-on expertise building production-grade platforms, hardware-accelerated DevSecOps pipelines, and offline-first mobile architectures. Proven record of engineering complex systems—from deterministic CUDA-to-HIP migration tooling for AMD MI300X enterprise hardware (RadeonShift AI) and FIFA 2026 3D Digital Twin command centers (OmniPitch 2026) to state-level native Android LMS platforms (UNIlearn Maharashtra) and full-stack AI learning platforms (LearnFlow LMS).',
+    'Experienced in UN volunteering (UN India Technology Hub), large-scale AI model training and evaluation (Outlier.ai), and open-source tooling backed by high test coverage, clean AST manipulation, and resilient offline architectures.'
+  ],
+  signalTag: 'Signal',
+  signals: [
+    'Enterprise CUDA-to-HIP pipeline (RadeonShift AI) with MoA dual-agent audit & live MI300X telemetry.',
+    'GenAI 3D Digital Twin command center (OmniPitch 2026) with Three.js, Vue 3, and 96% logic coverage.',
+    'High-performance offline-first mobile LMS (UNIlearn Maharashtra) with React Native 0.86, Expo 57 & Moodle REST API.',
+    'Full-stack AI LMS (LearnFlow) with Fireworks AI Gauntlet quiz engine, JWT auth, and certification workflows.'
+  ]
+};
+
+export const workSection = {
+  index: '02',
+  tag: 'Selected Work',
+  title: 'Projects that carry the portfolio.',
+  description: 'Production-focused builds verified with live telemetry, real APIs, and comprehensive test suites.'
+};
 
 export const projects = [
   {
@@ -155,6 +213,21 @@ export const projects = [
   }
 ];
 
+export const githubActivity = {
+  username: profile.githubUsername,
+  profileUrl: profile.githubUrl,
+  handle: profile.githubHandle,
+  endpoint: `https://github-contributions-api.jogruber.de/v4/${profile.githubUsername}`,
+  primaryLanguage: 'TypeScript · Python · Vue/React'
+};
+
+export const experienceSection = {
+  index: '03',
+  tag: 'Experience',
+  title: "Where I've contributed.",
+  description: 'From UN digital initiatives to AI model training at scale.'
+};
+
 export const experience = [
   {
     meta: 'March 2026 — Present · Remote',
@@ -178,6 +251,13 @@ export const experience = [
       'Optimized AI and LLM responses by designing prompts that intentionally generate errors to enhance model learning and improve accuracy. Trained AI models to refine their understanding and generate more accurate, context-aware responses by reviewing code and AI-generated outputs.'
   }
 ];
+
+export const stackSection = {
+  stackIndex: '04',
+  stackTag: 'Technical Stack',
+  educationIndex: '05',
+  educationTag: 'Education'
+};
 
 export const skillGroups = [
   {
@@ -241,14 +321,43 @@ export const education = [
   }
 ];
 
+export const credentialsSection = {
+  certIndex: '06',
+  certTag: 'Certifications',
+  achievementIndex: '07',
+  achievementTag: 'Achievements'
+};
+
 export const certifications = [
   'Microsoft AI Skills Fest (2026)',
   'Google AI Essentials',
   'Google Data Analytics Professional Certificate'
 ];
 
-export const scores = [
-  { label: 'Cognitive Total', value: 78.25 },
-  { label: 'Advanced Cognitive', value: 69.91 },
-  { label: 'Programming', value: 71.35 }
-];
+export const achievement = {
+  title: 'TCS NQT 2022',
+  id: 'ID: 22071272587',
+  scores: [
+    { label: 'Cognitive Total', value: 78.25 },
+    { label: 'Advanced Cognitive', value: 69.91 },
+    { label: 'Programming', value: 71.35 }
+  ]
+};
+
+export const contact = {
+  index: '08',
+  tag: 'Contact',
+  headlineLines: ["Let's build something sharp,", 'useful, and real.'],
+  subtitle: 'Open to full-time roles, contracts, and collaborations. I reply fast.',
+  links: [
+    { label: profile.email, href: profile.emailComposeUrl, icon: 'mail' },
+    { label: profile.githubHandle, href: profile.githubUrl, icon: 'github' },
+    { label: profile.linkedinHandle, href: profile.linkedinUrl, icon: 'linkedin' }
+  ]
+};
+
+export const footer = {
+  owner: profile.name,
+  rights: 'All rights reserved.',
+  builtWith: 'Built with ♥ in India'
+};

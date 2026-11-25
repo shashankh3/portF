@@ -6,9 +6,9 @@
     </div>
     <div class="pv-stage">
       <video
-        ref="video"
+        ref="videoRef"
         :src="videoSrc"
-        :poster="poster"
+        :poster="poster || undefined"
         muted
         loop
         playsinline
@@ -29,124 +29,156 @@
         :data-testid="`project-video-toggle-${id}`"
         @click="toggle"
       >
-        <svg v-if="playing" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
-        <svg v-else width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z"/></svg>
+        <AppIcon :name="playing ? 'pause' : 'play'" :size="14" />
       </button>
     </div>
   </figure>
 </template>
 
-<script>
-export default {
-  name: 'ProjectVideo',
-  props: {
-    id: { type: String, required: true },
-    label: { type: String, default: '' },
-    src: { type: String, required: true },
-    poster: { type: String, default: '' },
-    url: { type: String, default: '' }
-  },
-  data: () => ({ playing: false, userPaused: false, visible: false, videoSrc: null, failed: false }),
-  mounted() {
-    const video = this.$refs.video;
-    if (!video) return;
+<script setup>
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import AppIcon from '@/components/AppIcon.vue';
+import { prefersReducedMotion } from '@/utils/media';
 
-    // Safari/iOS only honour autoplay when the property (not just the
-    // attribute) is set before play() is called.
-    video.muted = true;
-    this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const props = defineProps({
+  id: { type: String, required: true },
+  label: { type: String, default: '' },
+  src: { type: String, required: true },
+  poster: { type: String, default: '' },
+  url: { type: String, default: '' }
+});
 
-    if (!('IntersectionObserver' in window)) {
-      this.visible = true;
-      this.load();
-      return;
-    }
+const videoRef = ref(null);
+const playing = ref(false);
+const videoSrc = ref(null);
+const failed = ref(false);
 
-    // Only pull the video bytes once the card is near the viewport. Without
-    // this every clip is fetched during initial page load.
-    this.lazyObserver = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        this.load();
-        if (this.lazyObserver) this.lazyObserver.disconnect();
-      },
-      { rootMargin: '400px 0px' }
-    );
-    this.lazyObserver.observe(this.$el);
+let userPaused = false;
+let visible = false;
+let reduceMotion = false;
+let unmounted = false;
+let observer = null;
+let lazyObserver = null;
+let visibilityHandler = null;
 
-    this.observer = new IntersectionObserver(
-      ([entry]) => {
-        this.visible = entry.isIntersecting;
-        if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
-        else if (!this.visible) video.pause();
-      },
-      { threshold: 0.5 }
-    );
-    this.observer.observe(video);
-
-    // A backgrounded tab should not keep decoding frames.
-    this.visibilityHandler = () => {
-      if (document.hidden) {
-        video.pause();
-      } else if (this.visible && !this.userPaused && !this.reduceMotion) {
-        this.play();
-      }
-    };
-    document.addEventListener('visibilitychange', this.visibilityHandler);
-  },
-  beforeUnmount() {
-    if (this.observer) this.observer.disconnect();
-    if (this.lazyObserver) this.lazyObserver.disconnect();
-    if (this.visibilityHandler) document.removeEventListener('visibilitychange', this.visibilityHandler);
-    const video = this.$refs.video;
-    if (video) {
-      video.pause();
-      video.removeAttribute('src');
-      video.load();
-    }
-  },
-  methods: {
-    load() {
-      if (this.videoSrc) return;
-      // null -> the src attribute is absent until we actually need the bytes.
-      this.videoSrc = this.src;
-      this.$nextTick(() => {
-        const video = this.$refs.video;
-        if (!video) return;
-        video.preload = 'metadata';
-        video.load();
-        // The clip may have become visible before it was fetched.
-        if (this.visible && !this.userPaused && !this.reduceMotion) this.play();
-      });
-    },
-    play() {
-      const video = this.$refs.video;
-      if (!video || this.failed) return;
-      if (!this.videoSrc) {
-        this.load();
-        return;
-      }
-      const result = video.play();
-      if (result && typeof result.catch === 'function') result.catch(() => {});
-    },
-    toggle() {
-      const video = this.$refs.video;
-      if (!video || this.failed) return;
-      if (!this.videoSrc) {
-        this.userPaused = false;
-        this.load();
-        return;
-      }
-      if (video.paused) {
-        this.userPaused = false;
-        this.play();
-      } else {
-        this.userPaused = true;
-        video.pause();
-      }
-    }
+function play() {
+  const video = videoRef.value;
+  if (!video || failed.value) return;
+  if (!videoSrc.value) {
+    load({ autoplay: true });
+    return;
   }
-};
+  const result = video.play();
+  if (result && typeof result.catch === 'function') result.catch(() => {});
+}
+
+function load({ autoplay = false } = {}) {
+  if (videoSrc.value) return;
+  // null -> the src attribute is absent until we actually need the bytes.
+  videoSrc.value = props.src;
+  nextTick(() => {
+    if (unmounted) return;
+    const video = videoRef.value;
+    if (!video) return;
+    video.preload = 'metadata';
+    video.load();
+    // Play if user explicitly triggered it, or if visible with autoplay allowed.
+    if (autoplay || (visible && !userPaused && !reduceMotion)) {
+      play();
+    }
+  });
+}
+
+function toggle() {
+  const video = videoRef.value;
+  if (!video || failed.value) return;
+  if (!videoSrc.value) {
+    userPaused = false;
+    load({ autoplay: true });
+    return;
+  }
+  if (video.paused) {
+    userPaused = false;
+    play();
+  } else {
+    userPaused = true;
+    video.pause();
+  }
+}
+
+onMounted(() => {
+  const video = videoRef.value;
+  if (!video || typeof window === 'undefined') return;
+
+  // Safari/iOS only honour autoplay when the property (not just the
+  // attribute) is set before play() is called.
+  video.muted = true;
+  reduceMotion = prefersReducedMotion();
+
+  // A backgrounded tab should not keep decoding frames.
+  visibilityHandler = () => {
+    if (typeof document === 'undefined') return;
+    if (document.hidden) {
+      video.pause();
+    } else if (visible && !userPaused && !reduceMotion) {
+      play();
+    }
+  };
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', visibilityHandler);
+  }
+
+  if (!('IntersectionObserver' in window)) {
+    visible = true;
+    load();
+    return;
+  }
+
+  // Only pull the video bytes once the card is near the viewport. Without
+  // this every clip is fetched during initial page load.
+  lazyObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return;
+      load();
+      lazyObserver?.disconnect();
+      lazyObserver = null;
+    },
+    { rootMargin: '400px 0px' }
+  );
+  lazyObserver.observe(video);
+
+  observer = new IntersectionObserver(
+    ([entry]) => {
+      visible = entry.isIntersecting;
+      if (visible && !userPaused && !reduceMotion) play();
+      else if (!visible) video.pause();
+    },
+    { threshold: 0.5 }
+  );
+  observer.observe(video);
+});
+
+onBeforeUnmount(() => {
+  unmounted = true;
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+  if (lazyObserver) {
+    lazyObserver.disconnect();
+    lazyObserver = null;
+  }
+  if (visibilityHandler && typeof document !== 'undefined') {
+    document.removeEventListener('visibilitychange', visibilityHandler);
+    visibilityHandler = null;
+  }
+  const video = videoRef.value;
+  if (video) {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  }
+});
 </script>
 
 <style scoped>
@@ -160,7 +192,7 @@ export default {
 .pv-stage{position:relative;aspect-ratio:16/10;background:#000}
 .pv-stage video{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
 .pv-btn{position:absolute;right:.7rem;bottom:.7rem;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(52,255,110,.45);color:var(--green);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:.75;transition:opacity .2s,transform .2s var(--ease-out),background .2s}
-.pv-btn svg{display:block}
+.pv-btn :deep(svg){display:block}
 .pv-stage:hover .pv-btn,.pv-btn:focus-visible{opacity:1}
 .pv-btn:hover{transform:scale(1.08);background:rgba(52,255,110,.18)}
 @media(max-width:640px){

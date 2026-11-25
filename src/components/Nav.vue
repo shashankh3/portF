@@ -1,12 +1,23 @@
 <template>
   <div>
-    <div class="nav-overlay" :class="{ 'is-open': menuOpen }" aria-hidden="true" @click="$emit('close-menu')"></div>
+    <div
+      class="nav-overlay"
+      :class="{ 'is-open': menuOpen }"
+      aria-hidden="true"
+      @click="$emit('close-menu')"
+    ></div>
     <nav aria-label="Primary">
       <div ref="scrollProgressBar" class="scroll-progress" aria-hidden="true"></div>
       <div class="nav-inner">
         <a href="#top" class="nav-logo" @click="$emit('close-menu')">
-          <img :src="faviconUrl" alt="" class="nav-yantra-icon" width="22" height="22" />
-          <span>SH // DEV</span>
+          <img
+            :src="faviconUrl"
+            alt=""
+            class="nav-yantra-icon"
+            width="22"
+            height="22"
+          >
+          <span>{{ brand }}</span>
         </a>
         <button
           class="nav-toggle"
@@ -40,10 +51,11 @@
 import { ref } from 'vue';
 
 defineProps({
+  brand: { type: String, required: true },
   menuOpen: { type: Boolean, default: false },
   navLinks: { type: Array, required: true },
   activeSection: { type: String, default: '' },
-  faviconUrl: { type: String, default: '' },
+  faviconUrl: { type: String, default: '' }
 });
 
 defineEmits(['toggle-menu', 'close-menu']);

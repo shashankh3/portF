@@ -7,7 +7,7 @@ export function useLazySection(sentinelRef, { rootMargin = '900px 0px' } = {}) {
 
   onMounted(() => {
     const sentinel = sentinelRef.value;
-    if (!sentinel || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || !sentinel || !('IntersectionObserver' in window)) {
       ready.value = true;
       return;
     }
@@ -16,7 +16,7 @@ export function useLazySection(sentinelRef, { rootMargin = '900px 0px' } = {}) {
       ([entry]) => {
         if (!entry.isIntersecting) return;
         ready.value = true;
-        observer.disconnect();
+        observer?.disconnect();
         observer = null;
       },
       { rootMargin }
@@ -25,7 +25,10 @@ export function useLazySection(sentinelRef, { rootMargin = '900px 0px' } = {}) {
   });
 
   onBeforeUnmount(() => {
-    if (observer) observer.disconnect();
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
   });
 
   return ready;

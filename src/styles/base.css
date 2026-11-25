@@ -11,7 +11,6 @@
   --green-mid: #17c94f;
   --green-dim: rgba(52,255,110,0.08);
   --font-mono: 'Space Mono', 'SFMono-Regular', Consolas, monospace;
-  --font-term: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
   --font-body: 'Inter', -apple-system, sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --shadow: 0 8px 40px rgba(0,0,0,0.6), 0 1px 0 rgba(52,255,110,0.06);

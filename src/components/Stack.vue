@@ -2,7 +2,7 @@
   <section id="stack" data-reveal aria-label="Technical stack and education">
     <div class="skills-grid">
       <div class="glass skills-card" data-reveal>
-        <div class="section-tag"><span class="sec-idx">04</span>Technical Stack</div>
+        <div class="section-tag"><span class="sec-idx">{{ section.stackIndex }}</span>{{ section.stackTag }}</div>
         <div v-for="group in skillGroups" :key="group.label" class="skill-group">
           <div class="skill-group-label">{{ group.label }}</div>
           <div class="tag-wrap">
@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="glass edu-card" data-reveal>
-        <div class="section-tag"><span class="sec-idx">05</span>Education</div>
+        <div class="section-tag"><span class="sec-idx">{{ section.educationIndex }}</span>{{ section.educationTag }}</div>
         <div v-for="item in education" :key="item.school" class="edu-block">
           <div class="edu-school">{{ item.school }}</div>
           <div class="edu-deg">{{ item.degree }}</div>
@@ -24,7 +24,8 @@
 
 <script setup>
 defineProps({
+  section: { type: Object, required: true },
   skillGroups: { type: Array, required: true },
-  education: { type: Array, required: true },
+  education: { type: Array, required: true }
 });
 </script>

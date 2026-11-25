@@ -24,20 +24,31 @@ export function useMenu() {
   };
 
   const onResize = () => {
-    if (menuOpen.value && window.innerWidth > MOBILE_BREAKPOINT) closeMenu();
+    if (typeof window !== 'undefined' && menuOpen.value && window.innerWidth > MOBILE_BREAKPOINT) {
+      closeMenu();
+    }
   };
 
+  let listening = false;
+
   onMounted(() => {
+    if (typeof window === 'undefined' || typeof window.addEventListener !== 'function') return;
     window.addEventListener('keydown', onKeydown);
     window.addEventListener('resize', onResize);
     window.addEventListener('orientationchange', onResize);
+    listening = true;
   });
 
   onBeforeUnmount(() => {
-    window.removeEventListener('keydown', onKeydown);
-    window.removeEventListener('resize', onResize);
-    window.removeEventListener('orientationchange', onResize);
-    document.body.classList.remove('nav-open');
+    if (listening && typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+      window.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('orientationchange', onResize);
+      listening = false;
+    }
+    if (typeof document !== 'undefined') {
+      document.body.classList.remove('nav-open');
+    }
   });
 
   return { menuOpen, toggleMenu, closeMenu };
