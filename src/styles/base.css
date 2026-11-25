@@ -34,26 +34,26 @@ button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#1fb84f,#0d7a2e);border-radius:99px;border:2px solid #000}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#4dff82,#12a03c)}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}.prompt-bar,.cursor-blink{animation:none!important;opacity:1!important}html.reveal-ready [data-reveal]{opacity:1!important;translate:none!important}}
-#matrix-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;background:#000;pointer-events:none;}
+#matrix-canvas{position:fixed;inset:0;z-index:0;width:100%;height:100%;background:#000;pointer-events:none;contain:strict;transform:translateZ(0);}
 /* Layered backdrop: rain -> vignette + soft top/bottom falloff -> cursor spotlight -> CRT scanlines.
    Veil values are all <= the original .55/.3/.5 linear, so the rain reads
    brighter than before at every edge while the text band stays as readable
    as it was originally. */
-.veil{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse 88% 70% at 50% 42%,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 72%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,rgba(0,0,0,.36) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.3) 100%),radial-gradient(ellipse 80% 60% at 50% 0%,rgba(52,255,110,.05),transparent 70%);}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;contain:strict;transform:translateZ(0);background:radial-gradient(ellipse 88% 70% at 50% 42%,rgba(0,0,0,.18) 0%,rgba(0,0,0,0) 72%,rgba(0,0,0,.3) 100%),linear-gradient(180deg,rgba(0,0,0,.36) 0%,rgba(0,0,0,.18) 40%,rgba(0,0,0,.3) 100%),radial-gradient(ellipse 80% 60% at 50% 0%,rgba(52,255,110,.05),transparent 70%);}
 /* A fixed-size layer moved with transform: tracking the pointer then composites
    instead of repainting a full-viewport gradient on every mouse move. */
 .spotlight{position:fixed;top:0;left:0;width:920px;height:920px;z-index:2;pointer-events:none;will-change:transform;transform:translate3d(calc(var(--mx,50vw) - 460px),calc(var(--my,30vh) - 460px),0);background:radial-gradient(circle 460px at 50% 50%,rgba(52,255,110,.075),rgba(52,255,110,.02) 45%,transparent 68%);}
-.scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.13) 3px 4px);opacity:.55;}
-.scanlines::after{content:'';position:absolute;left:0;right:0;height:200px;background:linear-gradient(to bottom,transparent,rgba(52,255,110,.035),transparent);animation:scan-sweep 11s linear infinite}
+.scanlines{position:fixed;inset:0;z-index:3;pointer-events:none;contain:strict;transform:translateZ(0);background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0 3px,rgba(0,0,0,.13) 3px 4px);opacity:.55;}
+.scanlines::after{content:'';position:absolute;left:0;right:0;height:200px;will-change:transform;background:linear-gradient(to bottom,transparent,rgba(52,255,110,.035),transparent);animation:scan-sweep 11s linear infinite}
 @keyframes scan-sweep{from{transform:translateY(-200px)}to{transform:translateY(100vh)}}
 @media(prefers-reduced-motion:reduce){.scanlines::after{display:none}}
 .shell{position:relative;z-index:4;width:min(1200px,calc(100% - var(--s8)));margin-inline:auto}
-nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(0,0,0,.38);border-bottom:1px solid rgba(52,255,110,.1);}
+nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(0,0,0,.48);border-bottom:1px solid rgba(52,255,110,.1);transform:translateZ(0);}
 body.nav-open{overflow:hidden}
 .nav-overlay{position:fixed;inset:0;z-index:9;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s var(--ease-out),visibility .25s;}
 .nav-overlay.is-open{opacity:1;visibility:visible;pointer-events:auto}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:var(--s4) var(--s6);max-width:1200px;margin-inline:auto;}
-.scroll-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--green-mid),var(--green));box-shadow:0 0 12px rgba(52,255,110,.7);transition:transform .12s linear}
+.scroll-progress{position:absolute;left:0;right:0;bottom:-1px;height:2px;transform-origin:0 50%;transform:scaleX(0);will-change:transform;background:linear-gradient(90deg,var(--green-mid),var(--green));box-shadow:0 0 12px rgba(52,255,110,.7);}
 .nav-logo{display:flex;align-items:center;gap:.6rem;font-family:var(--font-mono);font-size:.8rem;font-weight:700;letter-spacing:.2em;color:var(--green);text-transform:uppercase;}
 .nav-logo span{color:var(--muted)}
 .nav-toggle{display:none;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:44px;height:44px;flex-shrink:0;border-radius:10px;border:1px solid var(--border);background:rgba(52,255,110,.05);color:var(--green);transition:background .2s var(--ease-out),border-color .2s var(--ease-out);}

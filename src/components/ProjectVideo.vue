@@ -9,10 +9,10 @@
         ref="videoRef"
         :src="videoSrc"
         :poster="poster || undefined"
+        :preload="videoSrc ? 'metadata' : 'none'"
         muted
         loop
         playsinline
-        preload="none"
         disablepictureinpicture
         disableremoteplayback
         :aria-label="`${label || id} demo recording`"
@@ -40,6 +40,9 @@ import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import AppIcon from '@/components/AppIcon.vue';
 import { prefersReducedMotion } from '@/utils/media';
 
+const PLAY_SETTLE_MS = 80;
+const IDLE_PRELOAD_TIMEOUT_MS = 1200;
+
 const props = defineProps({
   id: { type: String, required: true },
   label: { type: String, default: '' },
@@ -60,6 +63,27 @@ let unmounted = false;
 let observer = null;
 let lazyObserver = null;
 let visibilityHandler = null;
+let playTimer = null;
+let idleHandle = null;
+let idleTimer = null;
+
+function clearPlayTimer() {
+  if (playTimer) {
+    clearTimeout(playTimer);
+    playTimer = null;
+  }
+}
+
+function clearIdleWarmup() {
+  if (idleHandle !== null && typeof window !== 'undefined' && typeof window.cancelIdleCallback === 'function') {
+    window.cancelIdleCallback(idleHandle);
+    idleHandle = null;
+  }
+  if (idleTimer) {
+    clearTimeout(idleTimer);
+    idleTimer = null;
+  }
+}
 
 function play() {
   const video = videoRef.value;
@@ -72,17 +96,25 @@ function play() {
   if (result && typeof result.catch === 'function') result.catch(() => {});
 }
 
+function scheduleAutoplay() {
+  clearPlayTimer();
+  if (!visible || userPaused || reduceMotion) return;
+  // Wait briefly for fast scrolling to settle before starting hardware decode.
+  playTimer = setTimeout(() => {
+    playTimer = null;
+    if (visible && !userPaused && !reduceMotion) play();
+  }, PLAY_SETTLE_MS);
+}
+
 function load({ autoplay = false } = {}) {
   if (videoSrc.value) return;
-  // null -> the src attribute is absent until we actually need the bytes.
+  clearIdleWarmup();
+  // null -> the src attribute is absent until initial render completes.
   videoSrc.value = props.src;
+  if (!autoplay && (!visible || userPaused || reduceMotion)) return;
+
   nextTick(() => {
     if (unmounted) return;
-    const video = videoRef.value;
-    if (!video) return;
-    video.preload = 'metadata';
-    video.load();
-    // Play if user explicitly triggered it, or if visible with autoplay allowed.
     if (autoplay || (visible && !userPaused && !reduceMotion)) {
       play();
     }
@@ -92,6 +124,7 @@ function load({ autoplay = false } = {}) {
 function toggle() {
   const video = videoRef.value;
   if (!video || failed.value) return;
+  clearPlayTimer();
   if (!videoSrc.value) {
     userPaused = false;
     load({ autoplay: true });
@@ -119,9 +152,10 @@ onMounted(() => {
   visibilityHandler = () => {
     if (typeof document === 'undefined') return;
     if (document.hidden) {
+      clearPlayTimer();
       video.pause();
     } else if (visible && !userPaused && !reduceMotion) {
-      play();
+      scheduleAutoplay();
     }
   };
   if (typeof document !== 'undefined') {
@@ -134,8 +168,8 @@ onMounted(() => {
     return;
   }
 
-  // Only pull the video bytes once the card is near the viewport. Without
-  // this every clip is fetched during initial page load.
+  // Pull metadata ahead of the viewport or once the browser goes idle after
+  // initial paint, so cards never stall while scrolling.
   lazyObserver = new IntersectionObserver(
     ([entry]) => {
       if (!entry.isIntersecting) return;
@@ -143,15 +177,25 @@ onMounted(() => {
       lazyObserver?.disconnect();
       lazyObserver = null;
     },
-    { rootMargin: '400px 0px' }
+    { rootMargin: '1000px 0px' }
   );
   lazyObserver.observe(video);
+
+  if (typeof window.requestIdleCallback === 'function') {
+    idleHandle = window.requestIdleCallback(() => load(), { timeout: IDLE_PRELOAD_TIMEOUT_MS });
+  } else {
+    idleTimer = setTimeout(() => load(), 300);
+  }
 
   observer = new IntersectionObserver(
     ([entry]) => {
       visible = entry.isIntersecting;
-      if (visible && !userPaused && !reduceMotion) play();
-      else if (!visible) video.pause();
+      if (visible) {
+        scheduleAutoplay();
+      } else {
+        clearPlayTimer();
+        video.pause();
+      }
     },
     { threshold: 0.5 }
   );
@@ -160,6 +204,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   unmounted = true;
+  clearPlayTimer();
+  clearIdleWarmup();
   if (observer) {
     observer.disconnect();
     observer = null;
@@ -182,7 +228,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.pv{margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(52,255,110,.22);background:#050b07;box-shadow:0 18px 50px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.4),0 0 32px rgba(52,255,110,.06);transition:box-shadow .3s var(--ease-out),border-color .3s var(--ease-out);}
+.pv{margin:0;border-radius:14px;overflow:hidden;border:1px solid rgba(52,255,110,.22);background:#050b07;box-shadow:0 18px 50px rgba(0,0,0,.65),0 0 0 1px rgba(0,0,0,.4),0 0 32px rgba(52,255,110,.06);transition:box-shadow .25s var(--ease-out),border-color .25s var(--ease-out);}
 .pv:hover{border-color:rgba(52,255,110,.45);box-shadow:0 22px 60px rgba(0,0,0,.7),0 0 40px rgba(52,255,110,.14)}
 .pv-bar{display:flex;align-items:center;gap:.75rem;padding:.55rem .8rem;background:rgba(255,255,255,.035);border-bottom:1px solid rgba(52,255,110,.12)}
 .pv-dots{display:flex;gap:.35rem}
@@ -191,7 +237,7 @@ onBeforeUnmount(() => {
 .pv-url{flex:1;font-family:var(--font-mono);font-size:.62rem;letter-spacing:.06em;color:var(--muted);padding:.2rem .6rem;border-radius:5px;background:rgba(0,0,0,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pv-stage{position:relative;aspect-ratio:16/10;background:#000}
 .pv-stage video{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
-.pv-btn{position:absolute;right:.7rem;bottom:.7rem;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.6);border:1px solid rgba(52,255,110,.45);color:var(--green);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:.75;transition:opacity .2s,transform .2s var(--ease-out),background .2s}
+.pv-btn{position:absolute;right:.7rem;bottom:.7rem;width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.72);border:1px solid rgba(52,255,110,.45);color:var(--green);opacity:.75;transition:opacity .2s,transform .2s var(--ease-out),background .2s}
 .pv-btn :deep(svg){display:block}
 .pv-stage:hover .pv-btn,.pv-btn:focus-visible{opacity:1}
 .pv-btn:hover{transform:scale(1.08);background:rgba(52,255,110,.18)}

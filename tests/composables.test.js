@@ -236,6 +236,34 @@ describe('useLazySection', () => {
 
     unmount();
   });
+
+  it('activates eagerly after eagerDelayMs when idle before scroll reaches sentinel', () => {
+    vi.useFakeTimers();
+    const observe = vi.fn();
+    const disconnect = vi.fn();
+
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        observe = observe;
+        disconnect = disconnect;
+      }
+    );
+    vi.stubGlobal('window', { IntersectionObserver: globalThis.IntersectionObserver });
+
+    const sentinel = { value: { id: 'sentinel' } };
+    const { result, unmount } = mountComposable(() =>
+      useLazySection(sentinel, { eagerDelayMs: 150 })
+    );
+
+    expect(result.value).toBe(false);
+    vi.advanceTimersByTime(150);
+    expect(result.value).toBe(true);
+    expect(disconnect).toHaveBeenCalledTimes(1);
+
+    unmount();
+    vi.useRealTimers();
+  });
 });
 
 describe('useReveal', () => {
@@ -285,9 +313,10 @@ describe('useReveal', () => {
 
     expect(docClassSet.has('reveal-ready')).toBe(true);
     expect(items[0].styles['--reveal-delay']).toBeUndefined();
-    expect(items[1].styles['--reveal-delay']).toBe('40ms');
-    expect(items[3].styles['--reveal-delay']).toBe('120ms');
-    expect(items[4].styles['--reveal-delay']).toBe('120ms');
+    expect(items[1].styles['--reveal-delay']).toBe('25ms');
+    expect(items[2].styles['--reveal-delay']).toBe('50ms');
+    expect(items[3].styles['--reveal-delay']).toBe('50ms');
+    expect(items[4].styles['--reveal-delay']).toBe('50ms');
     expect(observe).toHaveBeenCalledTimes(5);
 
     observerCallback([{ isIntersecting: true, target: items[1] }]);

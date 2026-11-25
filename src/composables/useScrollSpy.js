@@ -28,6 +28,7 @@ export function useScrollSpy({ sectionIds, progressRef = null }) {
 
   let sectionOffsets = [];
   let maxScroll = 0;
+  let lastProgress = -1;
   let scrollRaf = null;
   let measureRaf = null;
   let resizeObserver = null;
@@ -41,12 +42,15 @@ export function useScrollSpy({ sectionIds, progressRef = null }) {
       sectionOffsets
     });
 
-    showBackToTop.value = state.showBackToTop;
+    if (state.showBackToTop !== showBackToTop.value) {
+      showBackToTop.value = state.showBackToTop;
+    }
 
     // Write the progress bar transform straight to the DOM. Binding it to a
     // reactive value would re-render the whole page on every scroll frame.
     const bar = progressRef?.value;
-    if (bar) {
+    if (bar && state.progress !== lastProgress) {
+      lastProgress = state.progress;
       bar.style.transform = `scaleX(${state.progress})`;
     }
 

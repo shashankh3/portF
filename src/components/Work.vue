@@ -60,5 +60,7 @@ defineProps({
 });
 
 const ghSentinel = ref(null);
-const ghReady = useLazySection(ghSentinel);
+// Mount eagerly after first paint (~150ms idle) or immediately when scrolled near,
+// eliminating mid-scroll chunk loads and layout shifts.
+const ghReady = useLazySection(ghSentinel, { rootMargin: '1600px 0px', eagerDelayMs: 150 });
 </script>

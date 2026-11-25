@@ -64,7 +64,7 @@
               <span></span>
             </div>
 
-            <div class="gh-weeks-grid">
+            <div class="gh-weeks-grid" @mouseover="onGridMouseOver" @mouseleave="hideTooltip">
               <div v-for="(week, wIdx) in weeksData" :key="wIdx" class="gh-week-col">
                 <template v-for="(day, dIdx) in week" :key="dIdx">
                   <span
@@ -73,8 +73,6 @@
                     :class="`level-${day.level}`"
                     :data-date="day.date"
                     :data-count="day.count"
-                    @mouseenter="showTooltip($event, day)"
-                    @mouseleave="hideTooltip"
                   ></span>
                   <span v-else class="gh-day-square level-empty"></span>
                 </template>
@@ -171,6 +169,7 @@ const tooltip = ref({
 });
 
 let abortController = null;
+let activeCell = null;
 
 const availableYears = computed(() => collectYears(contributionsData.value));
 const yearContributions = computed(() =>
@@ -227,11 +226,11 @@ async function fetchLiveContributions() {
   }
 }
 
-function showTooltip(event, day) {
+function showTooltip(target, day) {
   const card = cardRef.value;
-  if (!card || !event.target) return;
+  if (!card || !target) return;
 
-  const rect = event.target.getBoundingClientRect();
+  const rect = target.getBoundingClientRect();
   const parentRect = card.getBoundingClientRect();
   const rawX = rect.left - parentRect.left + rect.width / 2;
   const clampedX =
@@ -247,7 +246,22 @@ function showTooltip(event, day) {
   };
 }
 
+function onGridMouseOver(event) {
+  const cell = event.target?.closest?.('.gh-day-square[data-date]');
+  if (!cell) {
+    hideTooltip();
+    return;
+  }
+  if (cell === activeCell) return;
+  activeCell = cell;
+  showTooltip(cell, {
+    date: cell.dataset.date,
+    count: Number(cell.dataset.count)
+  });
+}
+
 function hideTooltip() {
+  activeCell = null;
   tooltip.value.visible = false;
 }
 
@@ -438,7 +452,7 @@ onBeforeUnmount(() => {
   height: 10px;
   border-radius: 2px;
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition: transform 0.12s ease;
 }
 .gh-day-square:hover {
   transform: scale(1.35);

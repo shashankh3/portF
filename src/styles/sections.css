@@ -6,7 +6,7 @@ section{padding:clamp(var(--s12),6vw,var(--s16)) 0}
 h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:#edfff2;margin-bottom:var(--s2);line-height:1.15;}
 .section-desc{color:var(--muted);max-width:64ch;margin-bottom:var(--s10);line-height:1.75}
 .gh-sentinel{height:1px;width:100%}
-.glass{position:relative;isolation:isolate;background:var(--surface);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:var(--shadow);overflow:hidden;transition:border-color .25s var(--ease-out),box-shadow .25s var(--ease-out),transform .25s var(--ease-out);}
+.glass{position:relative;isolation:isolate;contain:layout style paint;background:var(--surface);border:1px solid var(--border);border-radius:20px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:var(--shadow);overflow:hidden;transition:border-color .2s var(--ease-out),box-shadow .2s var(--ease-out),transform .2s var(--ease-out);}
 /* Cursor-tracking sheen (sits behind the card content) */
 .glass::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;background:radial-gradient(340px circle at var(--cx,50%) var(--cy,-10%),rgba(52,255,110,.14),transparent 62%),linear-gradient(135deg,rgba(52,255,110,.06) 0%,transparent 50%);}
 /* HUD corner brackets */
@@ -17,7 +17,7 @@ h2.section-title{font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-.03em;color:
 /* Scroll reveal: fade only, and quick. A slide offset reads as the page
    shifting under the reader, and a long transition keeps real content
    hidden. Opacity alone gets the same polish without the movement. */
-html.reveal-ready [data-reveal]{opacity:0;transition:opacity .32s var(--ease-out) var(--reveal-delay,0ms),border-color .25s var(--ease-out),box-shadow .25s var(--ease-out),transform .25s var(--ease-out);}
+html.reveal-ready [data-reveal]{opacity:0;transition:opacity .22s var(--ease-out) var(--reveal-delay,0ms),border-color .2s var(--ease-out),box-shadow .2s var(--ease-out),transform .2s var(--ease-out);}
 html.reveal-ready [data-reveal].is-visible{opacity:1}
 .about-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--s5);align-items:start}
 .about-card,.signal-card{padding:var(--s8)}

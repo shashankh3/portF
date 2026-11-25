@@ -1,7 +1,7 @@
 import { onBeforeUnmount, onMounted } from 'vue';
 
-const STAGGER_MS = 40;
-const MAX_STAGGER_STEPS = 3;
+const STAGGER_MS = 25;
+const MAX_STAGGER_STEPS = 2;
 
 export function useReveal(rootRef) {
   let observer = null;
@@ -19,7 +19,7 @@ export function useReveal(rootRef) {
       return;
     }
 
-    // Stagger siblings so grids cascade instead of popping in together.
+    // Stagger siblings lightly so grids feel cohesive without delaying reads.
     const siblingCounts = new WeakMap();
     for (const el of items) {
       const parent = el.parentElement;
@@ -41,9 +41,9 @@ export function useReveal(rootRef) {
           observer?.unobserve(entry.target);
         });
       },
-      // Reveal as soon as any part of the element is on screen, so text is
-      // never withheld from a reader who is already looking at it.
-      { threshold: 0, rootMargin: '0px 0px -8px 0px' }
+      // Pre-reveal slightly ahead of the viewport so content is already visible
+      // and composited before the user's eye reaches it during fast scrolling.
+      { threshold: 0, rootMargin: '180px 0px 180px 0px' }
     );
 
     items.forEach((el) => observer.observe(el));
