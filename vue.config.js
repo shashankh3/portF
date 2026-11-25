@@ -9,7 +9,10 @@ module.exports = defineConfig({
     performance: {
       // Static demo videos, PDF resume, and source maps are not part of the
       // initial render payload. Keep size checks active for JS/CSS bundles.
-      assetFilter: (assetFilename) => !/\.(map|mp4|pdf)$/i.test(assetFilename)
+      assetFilter: (assetFilename) => !/\.(map|mp4|pdf)$/i.test(assetFilename),
+      // Bundling the 77 KB contributions JSON eagerly eliminates mid-scroll
+      // chunk loads and layout shifts while keeping total gzipped payload ~68 KiB.
+      maxEntrypointSize: 300 * 1024
     }
   }
 });

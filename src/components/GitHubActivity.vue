@@ -52,7 +52,7 @@
             </div>
           </div>
 
-          <!-- Main Calendar Grid: Left Day Labels + Week Columns -->
+          <!-- Main Calendar Grid: Left Day Labels + Canvas Heatmap -->
           <div class="gh-days-and-grid">
             <div class="gh-weekday-labels">
               <span></span>
@@ -64,20 +64,13 @@
               <span></span>
             </div>
 
-            <div class="gh-weeks-grid" @mouseover="onGridMouseOver" @mouseleave="hideTooltip">
-              <div v-for="(week, wIdx) in weeksData" :key="wIdx" class="gh-week-col">
-                <template v-for="(day, dIdx) in week" :key="dIdx">
-                  <span
-                    v-if="day"
-                    class="gh-day-square"
-                    :class="`level-${day.level}`"
-                    :data-date="day.date"
-                    :data-count="day.count"
-                  ></span>
-                  <span v-else class="gh-day-square level-empty"></span>
-                </template>
-              </div>
-            </div>
+            <canvas
+              ref="gridCanvas"
+              class="gh-grid-canvas"
+              :class="{ 'has-hover': hoveredCell !== null }"
+              @mousemove="onCanvasMouseMove"
+              @mouseleave="hideTooltip"
+            ></canvas>
           </div>
         </div>
       </div>
@@ -133,7 +126,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import defaultPayload from '@/assets/github-contributions.json';
 import AppIcon from '@/components/AppIcon.vue';
 import {
@@ -148,6 +141,11 @@ import {
 
 const FETCH_TIMEOUT_MS = 8000;
 const TOOLTIP_EDGE_PADDING_PX = 108;
+const CELL_SIZE = 10;
+const CELL_GAP = 4;
+const CELL_STRIDE = CELL_SIZE + CELL_GAP;
+const CELL_RADIUS = 2;
+const LEVEL_COLORS = ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'];
 
 const bundledData = sanitizePayload(defaultPayload) || { contributions: [], total: {} };
 const bundledYears = collectYears(bundledData);
@@ -157,10 +155,12 @@ const props = defineProps({
 });
 
 const cardRef = ref(null);
+const gridCanvas = ref(null);
 // Bundled snapshot renders instantly; the live fetch only replaces it
 // when it succeeds and passes validation.
 const contributionsData = ref(bundledData);
 const selectedYear = ref(bundledYears[0] || String(new Date().getFullYear()));
+const hoveredCell = ref(null);
 const tooltip = ref({
   visible: false,
   text: '',
@@ -169,7 +169,8 @@ const tooltip = ref({
 });
 
 let abortController = null;
-let activeCell = null;
+let canvasRect = null;
+let cardRect = null;
 
 const availableYears = computed(() => collectYears(contributionsData.value));
 const yearContributions = computed(() =>
@@ -191,9 +192,71 @@ const monthHeaders = computed(() =>
   buildMonthHeaders(Number(selectedYear.value), weeksData.value)
 );
 
+function drawRoundedCell(ctx, x, y, size, radius) {
+  if (typeof ctx.roundRect === 'function') {
+    ctx.beginPath();
+    ctx.roundRect(x, y, size, size, radius);
+    return;
+  }
+  ctx.beginPath();
+  ctx.rect(x, y, size, size);
+}
+
+function renderGrid() {
+  const canvas = gridCanvas.value;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const weeks = weeksData.value;
+  const cols = Math.max(1, weeks.length);
+  const cssWidth = cols * CELL_STRIDE - CELL_GAP;
+  const cssHeight = 7 * CELL_STRIDE - CELL_GAP;
+  const dpr = typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+
+  const targetWidth = Math.round(cssWidth * dpr);
+  const targetHeight = Math.round(cssHeight * dpr);
+  if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    canvas.style.width = `${cssWidth}px`;
+    canvas.style.height = `${cssHeight}px`;
+  }
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+  const hover = hoveredCell.value;
+  for (let col = 0; col < weeks.length; col++) {
+    const week = weeks[col];
+    const x = col * CELL_STRIDE;
+    for (let row = 0; row < week.length; row++) {
+      const day = week[row];
+      if (!day) continue;
+      const y = row * CELL_STRIDE;
+      const isHovered = hover && hover.col === col && hover.row === row;
+
+      ctx.fillStyle = LEVEL_COLORS[day.level] || LEVEL_COLORS[0];
+      drawRoundedCell(ctx, x, y, CELL_SIZE, CELL_RADIUS);
+      ctx.fill();
+
+      if (day.level === 0) {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+      if (isHovered) {
+        ctx.strokeStyle = 'rgba(52, 255, 110, 0.85)';
+        ctx.lineWidth = 1.25;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
 function selectYear(year) {
   selectedYear.value = year;
-  tooltip.value.visible = false;
+  hideTooltip();
 }
 
 async function fetchLiveContributions() {
@@ -226,46 +289,62 @@ async function fetchLiveContributions() {
   }
 }
 
-function showTooltip(target, day) {
+function onCanvasMouseMove(event) {
+  const canvas = gridCanvas.value;
   const card = cardRef.value;
-  if (!card || !target) return;
+  if (!canvas || !card) return;
 
-  const rect = target.getBoundingClientRect();
-  const parentRect = card.getBoundingClientRect();
-  const rawX = rect.left - parentRect.left + rect.width / 2;
+  canvasRect = canvas.getBoundingClientRect();
+  cardRect = card.getBoundingClientRect();
+  const offsetX = event.clientX - canvasRect.left;
+  const offsetY = event.clientY - canvasRect.top;
+
+  const col = Math.floor(offsetX / CELL_STRIDE);
+  const row = Math.floor(offsetY / CELL_STRIDE);
+  const inCell =
+    offsetX >= 0 &&
+    offsetY >= 0 &&
+    offsetX - col * CELL_STRIDE <= CELL_SIZE &&
+    offsetY - row * CELL_STRIDE <= CELL_SIZE;
+
+  const day = inCell ? weeksData.value[col]?.[row] : null;
+  if (!day) {
+    hideTooltip();
+    return;
+  }
+
+  if (hoveredCell.value?.col === col && hoveredCell.value?.row === row) return;
+  hoveredCell.value = { col, row };
+
+  const cellLeft = canvasRect.left + col * CELL_STRIDE;
+  const cellTop = canvasRect.top + row * CELL_STRIDE;
+  const rawX = cellLeft - cardRect.left + CELL_SIZE / 2;
   const clampedX =
-    parentRect.width > TOOLTIP_EDGE_PADDING_PX * 2
-      ? Math.min(parentRect.width - TOOLTIP_EDGE_PADDING_PX, Math.max(TOOLTIP_EDGE_PADDING_PX, rawX))
+    cardRect.width > TOOLTIP_EDGE_PADDING_PX * 2
+      ? Math.min(cardRect.width - TOOLTIP_EDGE_PADDING_PX, Math.max(TOOLTIP_EDGE_PADDING_PX, rawX))
       : rawX;
 
   tooltip.value = {
     visible: true,
     text: formatDayLabel(day),
     x: clampedX,
-    y: rect.top - parentRect.top - 32
+    y: cellTop - cardRect.top - 32
   };
 }
 
-function onGridMouseOver(event) {
-  const cell = event.target?.closest?.('.gh-day-square[data-date]');
-  if (!cell) {
-    hideTooltip();
-    return;
-  }
-  if (cell === activeCell) return;
-  activeCell = cell;
-  showTooltip(cell, {
-    date: cell.dataset.date,
-    count: Number(cell.dataset.count)
-  });
+function hideTooltip() {
+  if (hoveredCell.value !== null) hoveredCell.value = null;
+  if (tooltip.value.visible) tooltip.value.visible = false;
+  canvasRect = null;
+  cardRect = null;
 }
 
-function hideTooltip() {
-  activeCell = null;
-  tooltip.value.visible = false;
-}
+watch([weeksData, hoveredCell], () => {
+  renderGrid();
+});
 
 onMounted(() => {
+  renderGrid();
   fetchLiveContributions();
 });
 
@@ -348,7 +427,7 @@ onBeforeUnmount(() => {
   padding: 0.35rem 0.75rem;
   border-radius: 6px;
   color: var(--muted);
-  transition: all 0.2s var(--ease-out);
+  transition: color 0.2s var(--ease-out), background 0.2s var(--ease-out);
 }
 .gh-year-btn:hover {
   color: #fff;
@@ -358,7 +437,6 @@ onBeforeUnmount(() => {
   color: #031c0a;
   background: var(--green);
   font-weight: 700;
-  box-shadow: 0 0 14px rgba(52, 255, 110, 0.4);
 }
 
 /* GitHub Exact Calendar Box */
@@ -367,7 +445,6 @@ onBeforeUnmount(() => {
   border: 1px solid #30363d;
   border-radius: 12px;
   padding: 1.25rem 1.4rem;
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .gh-calendar-scroll {
@@ -416,10 +493,11 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 
-/* Weekday labels + Weeks grid */
+/* Weekday labels + Heatmap canvas */
 .gh-days-and-grid {
   display: flex;
   gap: 6px;
+  align-items: flex-start;
 }
 .gh-weekday-labels {
   display: flex;
@@ -435,35 +513,15 @@ onBeforeUnmount(() => {
   line-height: 10px;
   color: #7d8590;
 }
-
-.gh-weeks-grid {
-  display: flex;
-  gap: 4px;
+.gh-grid-canvas {
+  display: block;
+  flex-shrink: 0;
 }
-.gh-week-col {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Exact GitHub Squares */
-.gh-day-square {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
+.gh-grid-canvas.has-hover {
   cursor: pointer;
-  transition: transform 0.12s ease;
-}
-.gh-day-square:hover {
-  transform: scale(1.35);
-  z-index: 5;
-  filter: drop-shadow(0 0 6px rgba(52, 255, 110, 0.8));
-}
-.level-empty {
-  visibility: hidden;
 }
 
-/* Exact GitHub Dark Theme Green Color Steps */
+/* Legend squares */
 .level-0 {
   background-color: #161b22;
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -558,7 +616,6 @@ onBeforeUnmount(() => {
   white-space: nowrap;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   z-index: 50;
-  animation: tooltip-fade 0.15s ease-out;
 }
 .gh-tooltip::after {
   content: '';
@@ -569,10 +626,6 @@ onBeforeUnmount(() => {
   border-width: 4px;
   border-style: solid;
   border-color: #1f242c transparent transparent transparent;
-}
-@keyframes tooltip-fade {
-  from { opacity: 0; transform: translate(-50%, -90%); }
-  to { opacity: 1; transform: translate(-50%, -100%); }
 }
 
 @media (max-width: 800px) {
